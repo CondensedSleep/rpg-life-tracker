@@ -1,14 +1,13 @@
 -- RPG Life Tracker - Initial Database Schema
 -- Created: 2024-12-01
 
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- Note: Using gen_random_uuid() built-in function (no extension needed)
 
 -- ============================================================================
 -- TABLE: characters
 -- ============================================================================
 CREATE TABLE characters (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id),
   name TEXT NOT NULL,
   class TEXT NOT NULL,
@@ -23,7 +22,7 @@ CREATE TABLE characters (
 -- TABLE: core_stats
 -- ============================================================================
 CREATE TABLE core_stats (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID REFERENCES characters(id) ON DELETE CASCADE,
   stat_name TEXT NOT NULL CHECK (stat_name IN ('body', 'mind', 'heart', 'soul')),
   base_value INTEGER NOT NULL DEFAULT 10,
@@ -36,7 +35,7 @@ CREATE TABLE core_stats (
 -- TABLE: abilities
 -- ============================================================================
 CREATE TABLE abilities (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID REFERENCES characters(id) ON DELETE CASCADE,
   core_stat TEXT NOT NULL CHECK (core_stat IN ('body', 'mind', 'heart', 'soul')),
   ability_name TEXT NOT NULL,
@@ -51,7 +50,7 @@ CREATE TABLE abilities (
 -- TABLE: traits
 -- ============================================================================
 CREATE TABLE traits (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID REFERENCES characters(id) ON DELETE CASCADE,
   trait_name TEXT NOT NULL,
   trait_type TEXT CHECK (trait_type IN ('feature', 'flaw', 'passive')),
@@ -65,7 +64,7 @@ CREATE TABLE traits (
 -- TABLE: inventory
 -- ============================================================================
 CREATE TABLE inventory (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID REFERENCES characters(id) ON DELETE CASCADE,
   item_name TEXT NOT NULL,
   description TEXT,
@@ -80,7 +79,7 @@ CREATE TABLE inventory (
 -- TABLE: quests
 -- ============================================================================
 CREATE TABLE quests (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID REFERENCES characters(id) ON DELETE CASCADE,
   quest_name TEXT NOT NULL,
   quest_type TEXT NOT NULL CHECK (quest_type IN ('daily', 'weekly', 'monthly', 'main')),
@@ -100,7 +99,7 @@ CREATE TABLE quests (
 -- TABLE: main_quest_milestones
 -- ============================================================================
 CREATE TABLE main_quest_milestones (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   quest_id UUID REFERENCES quests(id) ON DELETE CASCADE,
   milestone_name TEXT NOT NULL,
   description TEXT,
@@ -113,7 +112,7 @@ CREATE TABLE main_quest_milestones (
 -- TABLE: daily_rolls
 -- ============================================================================
 CREATE TABLE daily_rolls (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID REFERENCES characters(id) ON DELETE CASCADE,
   roll_date DATE NOT NULL,
   roll_value INTEGER NOT NULL CHECK (roll_value >= 1 AND roll_value <= 20),
@@ -126,7 +125,7 @@ CREATE TABLE daily_rolls (
 -- TABLE: hit_dice
 -- ============================================================================
 CREATE TABLE hit_dice (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID REFERENCES characters(id) ON DELETE CASCADE,
   max_hit_dice INTEGER NOT NULL CHECK (max_hit_dice >= 0),
   current_hit_dice INTEGER NOT NULL CHECK (current_hit_dice >= 0),
@@ -141,7 +140,7 @@ CREATE TABLE hit_dice (
 -- TABLE: journal_entries
 -- ============================================================================
 CREATE TABLE journal_entries (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID REFERENCES characters(id) ON DELETE CASCADE,
   entry_date DATE NOT NULL,
   journal_text TEXT,
@@ -153,7 +152,7 @@ CREATE TABLE journal_entries (
 -- TABLE: action_log
 -- ============================================================================
 CREATE TABLE action_log (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID REFERENCES characters(id) ON DELETE CASCADE,
   action_date DATE NOT NULL,
   action_time TIMESTAMPTZ DEFAULT NOW(),
@@ -192,7 +191,7 @@ CREATE TABLE action_log (
 -- TABLE: inspiration_tokens
 -- ============================================================================
 CREATE TABLE inspiration_tokens (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID REFERENCES characters(id) ON DELETE CASCADE,
   token_count INTEGER DEFAULT 0 CHECK (token_count >= 0),
   updated_at TIMESTAMPTZ DEFAULT NOW(),

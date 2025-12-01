@@ -1,3 +1,4 @@
+import { supabase } from './supabase'
 import { useStore } from '@/store'
 import {
   INITIAL_CHARACTER,
@@ -8,50 +9,221 @@ import {
 } from './seedData'
 
 /**
- * Load seed data into the Zustand store
- * This is used for single-user mode before Supabase is fully configured
+ * Load seed data into Supabase for a new user
+ * This creates the initial character with all stats, abilities, traits, and inventory
  */
-export function loadSeedData() {
-  const store = useStore.getState()
+export async function loadSeedData() {
+  try {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser()
 
-  // Load character
-  store.setCharacter(INITIAL_CHARACTER)
+    if (!user) {
+      console.log('⚠️ No authenticated user found, skipping seed data load')
+      return
+    }
 
-  // Load core stats
-  store.setCoreStats(INITIAL_CORE_STATS)
+    // Check if character already exists for this user
+    const { data: existingCharacter, error: checkError } = await supabase
+      .from('characters')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle()
 
-  // Load abilities (this will also trigger core stat recalculation)
-  store.setAbilities(INITIAL_ABILITIES)
+    if (checkError) {
+      console.error('Error checking for existing character:', checkError)
+    }
 
-  // Load traits
-  store.setTraits(INITIAL_TRAITS)
+    if (existingCharacter) {
+      console.log('✅ Character already exists, loading from database...')
+      await loadDataFromSupabase(user.id)
+      return
+    }
 
-  // Load inventory
-  store.setInventory(INITIAL_INVENTORY)
+    console.log('📝 Creating new character with seed data...')
 
-  // Initialize hit dice based on body stat
-  const bodyStatValue = store.getCoreStatValue('body')
-  if (bodyStatValue !== null) {
+    // Insert character with user_id
+    const { data: character, error: charError } = await supabase
+      .from('characters')
+      .insert([{
+        user_id: user.id,
+        name: INITIAL_CHARACTER.name,
+        class: INITIAL_CHARACTER.class,
+        level: INITIAL_CHARACTER.level,
+        current_xp: INITIAL_CHARACTER.current_xp,
+        xp_to_next_level: INITIAL_CHARACTER.xp_to_next_level,
+      }])
+      .select()
+      .single()
+
+    if (charError || !character) {
+      console.error('Error creating character:', charError)
+      return
+    }
+
+    // Insert core stats
+    const coreStatsData = Object.entries(INITIAL_CORE_STATS).map(([statName, stat]) => ({
+      character_id: character.id,
+      stat_name: statName,
+      base_value: stat.base_value,
+      current_value: stat.current_value,
+      modifier: stat.modifier,
+    }))
+
+    await supabase.from('core_stats').insert(coreStatsData)
+
+    // Insert abilities
+    const abilitiesData = INITIAL_ABILITIES.map(ability => ({
+      character_id: character.id,
+      core_stat: ability.core_stat,
+      ability_name: ability.ability_name,
+      initial_value: ability.initial_value,
+      current_value: ability.current_value,
+      times_used_this_level: ability.times_used_this_level,
+      total_times_used: ability.total_times_used,
+    }))
+
+    await supabase.from('abilities').insert(abilitiesData)
+
+    // Insert traits
+    const traitsData = INITIAL_TRAITS.map(trait => ({
+      character_id: character.id,
+      trait_name: trait.trait_name,
+      trait_type: trait.trait_type,
+      description: trait.description,
+      mechanical_effect: trait.mechanical_effect,
+      is_active: trait.is_active,
+    }))
+
+    await supabase.from('traits').insert(traitsData)
+
+    // Insert inventory
+    const inventoryData = INITIAL_INVENTORY.map(item => ({
+      character_id: character.id,
+      item_name: item.item_name,
+      description: item.description,
+      item_type: item.item_type,
+      passive_effect: item.passive_effect,
+      condition: item.condition,
+      is_equipped: item.is_equipped,
+    }))
+
+    await supabase.from('inventory').insert(inventoryData)
+
+    // Initialize hit dice
+    const bodyStatValue = 10 + INITIAL_ABILITIES
+      .filter(a => a.core_stat === 'body')
+      .reduce((sum, a) => sum + (a.current_value - a.initial_value), 0)
+
     const maxHD = Math.ceil(bodyStatValue / 2.5)
-    store.setHitDice({
-      id: crypto.randomUUID(),
-      character_id: INITIAL_CHARACTER.id,
+
+    await supabase.from('hit_dice').insert([{
+      character_id: character.id,
       max_hit_dice: maxHD,
       current_hit_dice: maxHD,
       exhaustion_level: 0,
       days_at_zero: 0,
       last_long_rest: null,
-      updated_at: new Date().toISOString(),
-    })
+    }])
+
+    // Initialize inspiration tokens
+    await supabase.from('inspiration_tokens').insert([{
+      character_id: character.id,
+      token_count: 0,
+    }])
+
+    console.log('✅ Seed data created in Supabase successfully!')
+
+    // Load into store
+    await loadDataFromSupabase(user.id)
+
+  } catch (error) {
+    console.error('Error loading seed data:', error)
+  }
+}
+
+/**
+ * Load character data from Supabase into the Zustand store
+ */
+async function loadDataFromSupabase(userId: string) {
+  const store = useStore.getState()
+
+  // Load character
+  const { data: character, error: charLoadError } = await supabase
+    .from('characters')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (charLoadError) {
+    console.error('Error loading character:', charLoadError)
+    return
   }
 
-  // Initialize inspiration tokens
-  store.setInspirationTokens({
-    id: crypto.randomUUID(),
-    character_id: INITIAL_CHARACTER.id,
-    token_count: 0,
-    updated_at: new Date().toISOString(),
-  })
+  if (character) {
+    store.setCharacter(character)
 
-  console.log('✅ Seed data loaded successfully!')
+    // Load core stats
+    const { data: coreStats } = await supabase
+      .from('core_stats')
+      .select('*')
+      .eq('character_id', character.id)
+
+    if (coreStats) {
+      store.setCoreStats(coreStats)
+    }
+
+    // Load abilities
+    const { data: abilities } = await supabase
+      .from('abilities')
+      .select('*')
+      .eq('character_id', character.id)
+
+    if (abilities) {
+      store.setAbilities(abilities)
+    }
+
+    // Load traits
+    const { data: traits } = await supabase
+      .from('traits')
+      .select('*')
+      .eq('character_id', character.id)
+
+    if (traits) {
+      store.setTraits(traits)
+    }
+
+    // Load inventory
+    const { data: inventory } = await supabase
+      .from('inventory')
+      .select('*')
+      .eq('character_id', character.id)
+
+    if (inventory) {
+      store.setInventory(inventory)
+    }
+
+    // Load hit dice
+    const { data: hitDice } = await supabase
+      .from('hit_dice')
+      .select('*')
+      .eq('character_id', character.id)
+      .maybeSingle()
+
+    if (hitDice) {
+      store.setHitDice(hitDice)
+    }
+
+    // Load inspiration tokens
+    const { data: inspiration } = await supabase
+      .from('inspiration_tokens')
+      .select('*')
+      .eq('character_id', character.id)
+      .maybeSingle()
+
+    if (inspiration) {
+      store.setInspirationTokens(inspiration)
+    }
+
+    console.log('✅ Data loaded from Supabase into store!')
+  }
 }
