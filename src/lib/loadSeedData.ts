@@ -6,6 +6,7 @@ import {
   INITIAL_ABILITIES,
   INITIAL_TRAITS,
   INITIAL_INVENTORY,
+  INITIAL_QUESTS,
 } from './seedData'
 
 /**
@@ -109,6 +110,24 @@ export async function loadSeedData() {
 
     await supabase.from('inventory').insert(inventoryData)
 
+    // Insert quests
+    const questsData = INITIAL_QUESTS.map(quest => ({
+      character_id: character.id,
+      quest_name: quest.quest_name,
+      quest_type: quest.quest_type,
+      core_stat: quest.core_stat,
+      abilities_used: quest.abilities_used,
+      xp_reward: quest.xp_reward,
+      difficulty_class: quest.difficulty_class,
+      progression_milestone: quest.progression_milestone,
+      times_completed: quest.times_completed,
+      description: quest.description,
+      deadline: quest.deadline,
+      is_active: quest.is_active,
+    }))
+
+    await supabase.from('quests').insert(questsData)
+
     // Initialize hit dice
     const bodyStatValue = 10 + INITIAL_ABILITIES
       .filter(a => a.core_stat === 'body')
@@ -200,6 +219,16 @@ async function loadDataFromSupabase(userId: string) {
 
     if (inventory) {
       store.setInventory(inventory)
+    }
+
+    // Load quests
+    const { data: quests } = await supabase
+      .from('quests')
+      .select('*')
+      .eq('character_id', character.id)
+
+    if (quests) {
+      store.setQuests(quests)
     }
 
     // Load hit dice
