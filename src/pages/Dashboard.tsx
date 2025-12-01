@@ -1,4 +1,6 @@
 import { useCharacter, useCoreStats, useAbilities } from '@/store'
+import { TraitsList } from '@/components/character/TraitsList'
+import { InventoryList } from '@/components/character/InventoryList'
 
 export function Dashboard() {
   const character = useCharacter()
@@ -65,10 +67,10 @@ export function Dashboard() {
         ))}
       </div>
 
-      {/* Placeholder for quests */}
-      <div className="mt-8 p-6 bg-bg-secondary rounded-lg border border-border">
-        <h2 className="text-2xl font-bold mb-4">Active Quests</h2>
-        <p className="text-text-secondary">Quest system will be implemented in Phase 4</p>
+      {/* Traits & Inventory */}
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TraitsList />
+        <InventoryList />
       </div>
     </div>
   )
