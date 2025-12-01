@@ -1,34 +1,30 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { MainLayout } from './components/layout/MainLayout'
+import { Dashboard } from './pages/Dashboard'
+import { Quests } from './pages/Quests'
+import { Journal } from './pages/Journal'
+import { Stats } from './pages/Stats'
+import { loadSeedData } from './lib/loadSeedData'
 
 function App() {
-  const [count, setCount] = useState(0)
+  useEffect(() => {
+    // Load seed data on app initialization
+    // In production, this would be replaced with Supabase data fetching
+    loadSeedData()
+  }, [])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <BrowserRouter>
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/quests" element={<Quests />} />
+          <Route path="/journal" element={<Journal />} />
+          <Route path="/stats" element={<Stats />} />
+        </Routes>
+      </MainLayout>
+    </BrowserRouter>
   )
 }
 
