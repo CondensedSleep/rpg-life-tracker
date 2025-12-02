@@ -200,7 +200,7 @@ export async function loadSeedData() {
 /**
  * Load character data from Supabase into the Zustand store
  */
-async function loadDataFromSupabase(userId: string) {
+export async function loadDataFromSupabase(userId: string) {
   const store = useStore.getState()
 
   // Load character
