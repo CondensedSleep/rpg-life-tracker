@@ -217,6 +217,7 @@ export function calculateTotalModifier(
   abilities: Ability[],
   traits: Trait[],
   inventory: InventoryItem[],
+  customEffects: any[], // CustomEffect[] - using any to avoid circular dependency
   dayState: {
     state: DayState
     affectedStats?: CoreStatName[]
@@ -319,6 +320,41 @@ export function calculateTotalModifier(
           value: 0,
         })
       }
+    }
+  }
+
+  // Apply custom effects (temporary daily buffs/debuffs)
+  for (const effect of customEffects) {
+    // Custom effects don't have conditions, they're always active until they expire
+
+    // Handle stat_modifier type with stat_modifiers array
+    if (effect.effect_type === 'stat_modifier' && effect.stat_modifiers) {
+      for (const statMod of effect.stat_modifiers) {
+        if (statMod.stat === abilityName) {
+          total += statMod.modifier
+          breakdown.push({
+            source: `${effect.effect_name} (custom)`,
+            value: statMod.modifier,
+          })
+        }
+      }
+    }
+
+    // Handle advantage/disadvantage
+    if (effect.effect_type === 'advantage' && effect.affected_stats?.includes(abilityName)) {
+      hasAdvantage = true
+      breakdown.push({
+        source: `${effect.effect_name} (advantage)`,
+        value: 0,
+      })
+    }
+
+    if (effect.effect_type === 'disadvantage' && effect.affected_stats?.includes(abilityName)) {
+      hasDisadvantage = true
+      breakdown.push({
+        source: `${effect.effect_name} (disadvantage)`,
+        value: 0,
+      })
     }
   }
 
