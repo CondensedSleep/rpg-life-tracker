@@ -70,11 +70,15 @@ export type InventoryFormValues = z.infer<typeof inventoryFormSchema>
 // QUEST VALIDATION SCHEMA
 // ============================================================================
 
-export const progressionMilestoneSchema = z.object({
+export const progressionMilestoneItemSchema = z.object({
   ability: z.string().min(1, 'Ability name is required'),
   every: z.number().min(1, 'Must be at least 1'),
   gain: z.number().min(1, 'Must gain at least 1'),
 })
+
+export const progressionMilestoneSchema = z.array(progressionMilestoneItemSchema).optional().nullable()
+
+export type ProgressionMilestoneFormValues = z.infer<typeof progressionMilestoneItemSchema>
 
 export const questFormSchema = z.object({
   quest_name: z.string().min(1, 'Quest name is required').max(200),
@@ -87,7 +91,7 @@ export const questFormSchema = z.object({
   abilities_used: z.array(z.string()).optional().nullable(),
   xp_reward: z.number().min(0, 'XP reward must be positive').default(1),
   difficulty_class: z.number().min(1).max(30).optional().nullable(),
-  progression_milestone: progressionMilestoneSchema.optional().nullable(),
+  progression_milestone: progressionMilestoneSchema,
   description: z.string().optional().nullable(),
   deadline: z.string().optional().nullable(), // ISO date string
   is_active: z.boolean().default(true),

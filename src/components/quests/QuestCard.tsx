@@ -54,10 +54,14 @@ export function QuestCard({ quest, onComplete, onEdit, onDelete }: QuestCardProp
                 Completed: {quest.times_completed} times
               </span>
             )}
-            {quest.progression_milestone && (
-              <span className="text-accent-success text-xs">
-                Every {quest.progression_milestone.every}: +{quest.progression_milestone.gain} {quest.progression_milestone.ability}
-              </span>
+            {quest.progression_milestone && quest.progression_milestone.length > 0 && (
+              <div className="text-accent-success text-xs space-y-0.5">
+                {quest.progression_milestone.map((milestone, idx) => (
+                  <div key={idx}>
+                    Every {milestone.every}: +{milestone.gain} {milestone.ability}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>

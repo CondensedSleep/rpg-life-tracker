@@ -8,6 +8,7 @@ import {
   INITIAL_INVENTORY,
   INITIAL_QUESTS,
 } from './seedData'
+import { migrateEffectsToArrays } from './migrations/migrateEffectsToArrays'
 
 /**
  * Load seed data into Supabase for a new user
@@ -36,6 +37,11 @@ export async function loadSeedData() {
 
     if (existingCharacter) {
       console.log('✅ Character already exists, loading from database...')
+
+      // Run migration for effects arrays (if needed)
+      console.log('🔄 Checking for effects migration...')
+      await migrateEffectsToArrays()
+
       await loadDataFromSupabase(user.id)
       return
     }

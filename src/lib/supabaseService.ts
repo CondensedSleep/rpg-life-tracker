@@ -169,27 +169,31 @@ export async function completeQuest(questId: string, characterId: string) {
 
   if (xpError) return { error: xpError }
 
-  // Check progression milestone
-  if (quest.progression_milestone) {
-    const milestone = quest.progression_milestone
+  // Check progression milestones
+  if (quest.progression_milestone && quest.progression_milestone.length > 0) {
     const newCompletionCount = quest.times_completed + 1
 
-    if (newCompletionCount % milestone.every === 0) {
-      // Increment ability value
-      const { data: ability, error: abilityFetchError } = await supabase
-        .from('abilities')
-        .select('*')
-        .eq('character_id', characterId)
-        .eq('ability_name', milestone.ability)
-        .single()
-
-      if (!abilityFetchError && ability) {
-        await supabase
+    // Check each milestone
+    for (const milestone of quest.progression_milestone) {
+      if (newCompletionCount % milestone.every === 0) {
+        // Increment ability value
+        const { data: ability, error: abilityFetchError } = await supabase
           .from('abilities')
-          .update({
-            current_value: ability.current_value + milestone.gain
-          })
-          .eq('id', ability.id)
+          .select('*')
+          .eq('character_id', characterId)
+          .eq('ability_name', milestone.ability)
+          .single()
+
+        if (!abilityFetchError && ability) {
+          await supabase
+            .from('abilities')
+            .update({
+              current_value: ability.current_value + milestone.gain
+            })
+            .eq('id', ability.id)
+
+          console.log(`✨ Milestone reached! +${milestone.gain} ${milestone.ability}`)
+        }
       }
     }
   }

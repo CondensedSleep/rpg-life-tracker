@@ -110,7 +110,7 @@ export interface Quest {
   abilities_used: string[] | null
   xp_reward: number
   difficulty_class: number | null
-  progression_milestone: ProgressionMilestone | null
+  progression_milestone: ProgressionMilestone[] | null
   times_completed: number
   description: string | null
   deadline: string | null
@@ -260,7 +260,7 @@ export interface QuestFormData {
   abilities_used: string[]
   xp_reward: number
   difficulty_class?: number
-  progression_milestone?: ProgressionMilestone
+  progression_milestone?: ProgressionMilestone[]
   description?: string
   deadline?: string
 }
