@@ -51,11 +51,16 @@ export interface Ability {
 // Traits & Inventory
 // ============================================================================
 
+export interface StatModifier {
+  stat: string
+  modifier: number
+}
+
 export interface MechanicalEffect {
-  type?: 'stat_modifier' | 'advantage' | 'disadvantage' | 'rest' | 'custom'
-  stat?: string
-  stats?: string[]
-  modifier?: number
+  type?: 'stat_modifier' | 'advantage' | 'disadvantage' | 'custom'
+  affected_stats?: string[]  // For advantage/disadvantage
+  stat_modifiers?: StatModifier[]  // For stat_modifier type with individual modifiers per stat
+  modifier?: number  // For advantage/disadvantage with a flat modifier
   condition?: string
   description?: string
 }
@@ -72,9 +77,10 @@ export interface Trait {
 }
 
 export interface PassiveEffect {
-  stat?: string
-  modifier?: number
-  type?: 'advantage' | 'disadvantage' | 'custom'
+  type?: 'stat_modifier' | 'advantage' | 'disadvantage' | 'custom'
+  affected_stats?: string[]  // For advantage/disadvantage
+  stat_modifiers?: StatModifier[]  // For stat_modifier type with individual modifiers per stat
+  modifier?: number  // For advantage/disadvantage with a flat modifier
   condition?: string
   description?: string
 }

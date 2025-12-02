@@ -4,11 +4,16 @@ import { z } from 'zod'
 // MECHANICAL EFFECT SCHEMA (for Traits)
 // ============================================================================
 
+export const statModifierSchema = z.object({
+  stat: z.string().min(1, 'Stat is required'),
+  modifier: z.number(),
+})
+
 export const mechanicalEffectItemSchema = z.object({
-  type: z.enum(['stat_modifier', 'advantage', 'disadvantage', 'rest', 'custom']).optional(),
-  stat: z.string().optional(),
-  stats: z.array(z.string()).optional(),
-  modifier: z.number().optional(),
+  type: z.enum(['stat_modifier', 'advantage', 'disadvantage', 'custom']).optional(),
+  affected_stats: z.array(z.string()).optional(),  // For advantage/disadvantage
+  stat_modifiers: z.array(statModifierSchema).optional(),  // For stat_modifier with individual modifiers
+  modifier: z.number().optional(),  // Flat modifier for advantage/disadvantage
   condition: z.string().optional(),
   description: z.string().optional(),
 })
@@ -22,9 +27,10 @@ export type MechanicalEffectFormValues = z.infer<typeof mechanicalEffectItemSche
 // ============================================================================
 
 export const passiveEffectItemSchema = z.object({
-  stat: z.string().optional(),
-  modifier: z.number().optional(),
-  type: z.enum(['advantage', 'disadvantage', 'custom']).optional(),
+  type: z.enum(['stat_modifier', 'advantage', 'disadvantage', 'custom']).optional(),
+  affected_stats: z.array(z.string()).optional(),  // For advantage/disadvantage
+  stat_modifiers: z.array(statModifierSchema).optional(),  // For stat_modifier with individual modifiers
+  modifier: z.number().optional(),  // Flat modifier for advantage/disadvantage
   condition: z.string().optional(),
   description: z.string().optional(),
 })
