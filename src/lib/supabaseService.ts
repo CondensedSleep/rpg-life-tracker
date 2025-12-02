@@ -312,12 +312,16 @@ export async function levelUpCharacter(characterId: string, abilityName: string)
   const newLevel = character.level + 1
   const newXPToNext = calculateXPToNextLevel(newLevel)
 
-  // Update character level and XP threshold
+  // Calculate excess XP to carry over to next level
+  const excessXP = Math.max(0, character.current_xp - character.xp_to_next_level)
+
+  // Update character level, XP threshold, and carry over excess XP
   const { error: levelUpError } = await supabase
     .from('characters')
     .update({
       level: newLevel,
       xp_to_next_level: newXPToNext,
+      current_xp: excessXP,
     })
     .eq('id', characterId)
 

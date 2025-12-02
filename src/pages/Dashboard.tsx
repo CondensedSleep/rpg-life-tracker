@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import type { DailyRoll, CoreStatName, Trait, InventoryItem } from '@/types'
 import { TraitForm } from '@/components/character/TraitForm'
 import { InventoryForm } from '@/components/character/InventoryForm'
+import { QuickLogForm } from '@/components/QuickLogForm'
+import { ActiveEffects } from '@/components/ActiveEffects'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
@@ -36,6 +38,7 @@ export function Dashboard() {
   const hitDice = useStore((state) => state.hitDice)
   const setHitDice = useStore((state) => state.setHitDice)
   const takeLongRest = useStore((state) => state.takeLongRest)
+  const customEffects = useStore((state) => state.customEffects)
   const [todayRoll, setTodayRoll] = useState<DailyRoll | null>(null)
   const navigate = useNavigate()
 
@@ -52,6 +55,7 @@ export function Dashboard() {
   // Level up modal
   const [showLevelUpModal, setShowLevelUpModal] = useState(false)
   const [selectedAbilityForLevelUp, setSelectedAbilityForLevelUp] = useState<string | null>(null)
+  const [isLevelingUp, setIsLevelingUp] = useState(false)
 
   const today = getTodayLocalDate()
 
@@ -105,33 +109,38 @@ export function Dashboard() {
   }
 
   const handleLevelUp = async () => {
-    if (!selectedAbilityForLevelUp || !character) return
+    if (!selectedAbilityForLevelUp || !character || isLevelingUp) return
 
+    setIsLevelingUp(true)
     console.log('🌟 Leveling up with ability:', selectedAbilityForLevelUp)
 
-    // Persist to database
-    const { error } = await levelUpCharacter(character.id, selectedAbilityForLevelUp)
+    try {
+      // Persist to database
+      const { error } = await levelUpCharacter(character.id, selectedAbilityForLevelUp)
 
-    if (error) {
-      console.error('Error leveling up:', error)
-      alert('Failed to level up: ' + error.message)
-      return
+      if (error) {
+        console.error('Error leveling up:', error)
+        alert('Failed to level up: ' + error.message)
+        return
+      }
+
+      // Update local state
+      levelUp(selectedAbilityForLevelUp)
+
+      // Reload data from database to ensure sync
+      await loadDataFromSupabase(character.user_id)
+
+      setShowLevelUpModal(false)
+      setSelectedAbilityForLevelUp(null)
+
+      console.log('✅ Level up complete!')
+    } finally {
+      setIsLevelingUp(false)
     }
-
-    // Update local state
-    levelUp(selectedAbilityForLevelUp)
-
-    // Reload data from database to ensure sync
-    await loadDataFromSupabase(character.user_id)
-
-    setShowLevelUpModal(false)
-    setSelectedAbilityForLevelUp(null)
-
-    console.log('✅ Level up complete!')
   }
 
-  // Get abilities eligible for level up (used 5+ times this level)
-  const eligibleAbilities = abilities.filter(a => a.times_used_this_level >= 5)
+  // Get abilities eligible for level up (used at least once this level)
+  const eligibleAbilities = abilities.filter(a => a.times_used_this_level >= 1)
 
   const handleTakeLongRest = async () => {
     if (!character || !hitDice) return
@@ -412,6 +421,7 @@ export function Dashboard() {
                       abilities,
                       traits,
                       inventory,
+                      customEffects,
                       {
                         state: todayRoll?.day_state || 'normal',
                         affectedStats: todayRoll?.affected_stats || [],
@@ -632,20 +642,11 @@ export function Dashboard() {
       </div>
 
       {/* ================================================================
-          SECTION 3: Quick Log Form
+          SECTION 3: Quick Log Form and Active Effects
           ================================================================ */}
-      <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
-        <h2 className="text-xl font-semibold mb-4">Quick Log</h2>
-        <div className="text-text-secondary text-center py-8">
-          <p className="mb-4">Log rolls and actions without navigating to the journal</p>
-          <p className="text-sm italic">Quick log form coming soon...</p>
-          <button
-            onClick={() => navigate('/journal')}
-            className="mt-4 px-6 py-2 bg-accent-secondary text-white rounded-md hover:bg-accent-secondary/80 transition-colors"
-          >
-            Go to Journal
-          </button>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <QuickLogForm />
+        <ActiveEffects />
       </div>
 
       {/* Trait Modals */}
@@ -813,10 +814,10 @@ export function Dashboard() {
               </Button>
               <Button
                 onClick={handleLevelUp}
-                disabled={!selectedAbilityForLevelUp}
+                disabled={!selectedAbilityForLevelUp || isLevelingUp}
                 className="bg-accent-success hover:bg-accent-success/80"
               >
-                Confirm Level Up
+                {isLevelingUp ? 'Leveling Up...' : 'Confirm Level Up'}
               </Button>
             </div>
           </div>

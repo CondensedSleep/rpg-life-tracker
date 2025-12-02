@@ -1,5 +1,5 @@
 import type { StateCreator } from 'zustand'
-import type { DailyRoll, HitDice, InspirationTokens, DayState, CoreStatName } from '@/types'
+import type { DailyRoll, HitDice, InspirationTokens, CustomEffect, DayState, CoreStatName } from '@/types'
 import { determineDayState } from '@/lib/calculations'
 import { getTodayLocalDate } from '@/lib/dateUtils'
 
@@ -8,11 +8,15 @@ export interface GameStateState {
   dailyRoll: DailyRoll | null
   hitDice: HitDice | null
   inspirationTokens: InspirationTokens | null
+  customEffects: CustomEffect[]
 
   // Actions
   setDailyRoll: (roll: DailyRoll) => void
   setHitDice: (hitDice: HitDice) => void
   setInspirationTokens: (tokens: InspirationTokens) => void
+  setCustomEffects: (effects: CustomEffect[]) => void
+  addCustomEffect: (effect: CustomEffect) => void
+  removeCustomEffect: (effectId: string) => void
 
   // Daily roll actions
   recordDailyRoll: (rollValue: number, affectedStats?: CoreStatName[], selectedStat?: CoreStatName) => void
@@ -33,11 +37,21 @@ export const createGameStateSlice: StateCreator<GameStateState> = (set, get) => 
   dailyRoll: null,
   hitDice: null,
   inspirationTokens: null,
+  customEffects: [],
 
   // Setters
   setDailyRoll: (roll) => set({ dailyRoll: roll }),
   setHitDice: (hitDice) => set({ hitDice }),
   setInspirationTokens: (tokens) => set({ inspirationTokens: tokens }),
+  setCustomEffects: (effects) => set({ customEffects: effects }),
+  addCustomEffect: (effect) => {
+    const { customEffects } = get()
+    set({ customEffects: [...customEffects, effect] })
+  },
+  removeCustomEffect: (effectId) => {
+    const { customEffects } = get()
+    set({ customEffects: customEffects.filter(e => e.id !== effectId) })
+  },
 
   // Daily roll actions
   recordDailyRoll: (rollValue, affectedStats, _selectedStat) => {

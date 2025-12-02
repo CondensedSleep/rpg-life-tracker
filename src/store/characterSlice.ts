@@ -111,12 +111,16 @@ export const createCharacterSlice: StateCreator<CharacterState> = (set, get) => 
     const newLevel = character.level + 1
     const newXPToNext = calculateXPToNextLevel(newLevel)
 
-    // Update character level
+    // Calculate excess XP to carry over
+    const excessXP = Math.max(0, character.current_xp - character.xp_to_next_level)
+
+    // Update character level and carry over excess XP
     set({
       character: {
         ...character,
         level: newLevel,
         xp_to_next_level: newXPToNext,
+        current_xp: excessXP,
       },
     })
 

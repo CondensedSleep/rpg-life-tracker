@@ -18,8 +18,7 @@ CREATE TABLE custom_effects (
 -- Indexes
 CREATE INDEX idx_custom_effects_character_id ON custom_effects(character_id);
 CREATE INDEX idx_custom_effects_expires_at ON custom_effects(expires_at);
-CREATE INDEX idx_custom_effects_character_active ON custom_effects(character_id, expires_at)
-  WHERE expires_at > NOW();
+CREATE INDEX idx_custom_effects_character_active ON custom_effects(character_id, expires_at);
 
 -- RLS Policies
 ALTER TABLE custom_effects ENABLE ROW LEVEL SECURITY;

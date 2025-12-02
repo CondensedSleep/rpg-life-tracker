@@ -46,6 +46,7 @@ export async function recalculateAbilityValues(
         abilities,
         updatedTraits, // Use updated traits with correct is_active values
         inventory,
+        [], // No custom effects for stored values
         {
           state: 'normal', // Don't include day state in stored values
           affectedStats: [],

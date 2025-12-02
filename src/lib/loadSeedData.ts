@@ -9,6 +9,7 @@ import {
   INITIAL_QUESTS,
 } from './seedData'
 import { migrateEffectsToArrays } from './migrations/migrateEffectsToArrays'
+import { cleanupExpiredEffects } from './actionLogService'
 
 // Flag to prevent duplicate loads during React StrictMode double-render
 let isLoading = false
@@ -320,6 +321,23 @@ export async function loadDataFromSupabase(userId: string) {
 
     if (inspiration) {
       store.setInspirationTokens(inspiration)
+    }
+
+    // Cleanup expired custom effects first
+    await cleanupExpiredEffects(character.id)
+
+    // Load active custom effects
+    const { data: customEffects } = await supabase
+      .from('custom_effects')
+      .select('*')
+      .eq('character_id', character.id)
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+
+    if (customEffects) {
+      store.setCustomEffects(customEffects)
+    } else {
+      store.setCustomEffects([])
     }
 
     console.log('✅ Data loaded from Supabase into store!')
