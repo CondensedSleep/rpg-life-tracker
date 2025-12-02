@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useCharacter, useAbilities, useStore } from '@/store'
-import { 
-  getOrCreateJournalEntry, 
-  logDailyRoll, 
+import {
+  getOrCreateJournalEntry,
+  logDailyRoll,
   getDailyRoll,
   getActionLogForDate,
 } from '@/lib/journalService'
 import { determineDayState } from '@/lib/calculations'
-import { getTodayLocalDate, toLocalDateString } from '@/lib/dateUtils'
+import { getTodayLocalDate, addDays, parseLocalDate } from '@/lib/dateUtils'
 import type { JournalEntry, DailyRoll, ActionLog } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -66,15 +66,11 @@ export function Journal() {
   }, [character, selectedDate])
 
   const handlePreviousDay = () => {
-    const date = new Date(selectedDate)
-    date.setDate(date.getDate() - 1)
-    setSelectedDate(toLocalDateString(date))
+    setSelectedDate(addDays(selectedDate, -1))
   }
 
   const handleNextDay = () => {
-    const date = new Date(selectedDate)
-    date.setDate(date.getDate() + 1)
-    setSelectedDate(toLocalDateString(date))
+    setSelectedDate(addDays(selectedDate, 1))
   }
 
   const handleToday = () => {
@@ -170,7 +166,7 @@ export function Journal() {
   const currentDayInfo = dailyRoll ? dayStateInfo[dailyRoll.day_state] : null
 
   const isToday = selectedDate === getTodayLocalDate()
-  const isFuture = new Date(selectedDate) > new Date()
+  const isFuture = parseLocalDate(selectedDate) > new Date()
 
   const formattedDate = new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'long',

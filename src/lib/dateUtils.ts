@@ -18,3 +18,22 @@ export function toLocalDateString(date: Date): string {
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
+/**
+ * Parse a YYYY-MM-DD string into a Date object in local timezone
+ * Avoids UTC interpretation that causes timezone offset issues
+ */
+export function parseLocalDate(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
+
+/**
+ * Add days to a YYYY-MM-DD date string
+ * Returns a new YYYY-MM-DD string
+ */
+export function addDays(dateString: string, days: number): string {
+  const date = parseLocalDate(dateString)
+  date.setDate(date.getDate() + days)
+  return toLocalDateString(date)
+}

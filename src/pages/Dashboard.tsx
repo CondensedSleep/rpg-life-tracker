@@ -31,6 +31,7 @@ export function Dashboard() {
   const inventory = useStore((state) => state.inventory)
   const removeTrait = useStore((state) => state.removeTrait)
   const removeInventoryItem = useStore((state) => state.removeInventoryItem)
+  const levelUp = useStore((state) => state.levelUp)
   const [todayRoll, setTodayRoll] = useState<DailyRoll | null>(null)
   const navigate = useNavigate()
 
@@ -44,7 +45,21 @@ export function Dashboard() {
   const [editingInventory, setEditingInventory] = useState<InventoryItem | null>(null)
   const [deletingInventoryId, setDeletingInventoryId] = useState<string | null>(null)
 
+  // Level up modal
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false)
+  const [selectedAbilityForLevelUp, setSelectedAbilityForLevelUp] = useState<string | null>(null)
+
   const today = getTodayLocalDate()
+
+  // Check if character is ready to level up
+  const isReadyToLevelUp = character && character.current_xp >= character.xp_to_next_level
+
+  // Auto-show level up modal when ready
+  useEffect(() => {
+    if (isReadyToLevelUp && !showLevelUpModal) {
+      setShowLevelUpModal(true)
+    }
+  }, [isReadyToLevelUp])
 
   // Debug: Log trait statuses and abilities
   useEffect(() => {
@@ -84,6 +99,16 @@ export function Dashboard() {
     // Force re-fetch of data by navigating
     window.location.reload()
   }
+
+  const handleLevelUp = () => {
+    if (!selectedAbilityForLevelUp) return
+    levelUp(selectedAbilityForLevelUp)
+    setShowLevelUpModal(false)
+    setSelectedAbilityForLevelUp(null)
+  }
+
+  // Get abilities eligible for level up (used 5+ times this level)
+  const eligibleAbilities = abilities.filter(a => a.times_used_this_level >= 5)
 
   useEffect(() => {
     if (character) {
@@ -146,11 +171,22 @@ export function Dashboard() {
           <div>
             <div className="flex justify-between text-sm mb-2">
               <span>XP: {character.current_xp} / {character.xp_to_next_level}</span>
-              <span className="text-text-secondary">Next Level: {character.level + 1}</span>
+              {isReadyToLevelUp ? (
+                <button
+                  onClick={() => setShowLevelUpModal(true)}
+                  className="text-accent-warning font-bold hover:underline"
+                >
+                  🌟 Ready to Level Up!
+                </button>
+              ) : (
+                <span className="text-text-secondary">Next Level: {character.level + 1}</span>
+              )}
             </div>
             <div className="w-full bg-bg-tertiary rounded-full h-3">
               <div
-                className="bg-accent-primary h-3 rounded-full transition-all duration-300"
+                className={`h-3 rounded-full transition-all duration-300 ${
+                  isReadyToLevelUp ? 'bg-accent-warning animate-pulse' : 'bg-accent-primary'
+                }`}
                 style={{
                   width: `${Math.min((character.current_xp / character.xp_to_next_level) * 100, 100)}%`,
                 }}
@@ -551,6 +587,109 @@ export function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Level Up Modal */}
+      <Dialog open={showLevelUpModal} onOpenChange={setShowLevelUpModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">🌟 Level Up!</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            <div className="text-center">
+              <p className="text-lg mb-2">
+                Congratulations! You've reached <span className="font-bold text-accent-warning">Level {character?.level ? character.level + 1 : 1}</span>
+              </p>
+              <p className="text-sm text-text-secondary">
+                Choose an ability to increase by +1
+              </p>
+            </div>
+
+            {/* Eligible Abilities */}
+            {eligibleAbilities.length > 0 ? (
+              <div className="space-y-3">
+                <h3 className="font-semibold text-sm text-text-secondary uppercase">
+                  Eligible Abilities (Used 5+ times this level)
+                </h3>
+                <div className="grid gap-2">
+                  {eligibleAbilities.map(ability => (
+                    <button
+                      key={ability.id}
+                      onClick={() => setSelectedAbilityForLevelUp(ability.ability_name)}
+                      className={`p-4 rounded-lg border-2 transition-all text-left ${
+                        selectedAbilityForLevelUp === ability.ability_name
+                          ? 'border-accent-success bg-accent-success/10'
+                          : 'border-border bg-bg-secondary hover:border-accent-secondary'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-bold uppercase text-lg">{ability.ability_name}</div>
+                          <div className="text-sm text-text-secondary">
+                            {ability.core_stat} • Used {ability.times_used_this_level} times
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-accent-secondary">
+                            {ability.base_value} → {ability.base_value + 1}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="p-6 bg-bg-tertiary rounded-lg border border-border text-center">
+                <p className="text-text-secondary">
+                  No abilities are eligible for advancement yet.
+                  <br />
+                  <span className="text-sm">Use an ability 5+ times to make it eligible.</span>
+                </p>
+              </div>
+            )}
+
+            {/* All Abilities (for reference) */}
+            <div className="space-y-3">
+              <h3 className="font-semibold text-sm text-text-secondary uppercase">
+                All Abilities
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {abilities
+                  .filter(a => !eligibleAbilities.find(e => e.id === a.id))
+                  .map(ability => (
+                    <div
+                      key={ability.id}
+                      className="p-3 rounded-lg bg-bg-tertiary border border-border opacity-60"
+                    >
+                      <div className="font-semibold uppercase text-sm">{ability.ability_name}</div>
+                      <div className="text-xs text-text-secondary">
+                        Used {ability.times_used_this_level}/5 times
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Confirm Button */}
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowLevelUpModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleLevelUp}
+                disabled={!selectedAbilityForLevelUp}
+                className="bg-accent-success hover:bg-accent-success/80"
+              >
+                Confirm Level Up
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
