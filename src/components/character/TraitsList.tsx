@@ -101,17 +101,22 @@ export function TraitsList() {
                   {trait.description && (
                     <p className="text-text-secondary">{trait.description}</p>
                   )}
-                  {trait.mechanical_effect && (
-                    <div className="text-sm text-accent-secondary">
-                      <strong>Effect:</strong>{' '}
-                      {trait.mechanical_effect.type === 'stat_modifier' &&
-                        `${trait.mechanical_effect.modifier > 0 ? '+' : ''}${trait.mechanical_effect.modifier} to ${
-                          trait.mechanical_effect.stats?.join(', ') || trait.mechanical_effect.stat
-                        }`}
-                      {trait.mechanical_effect.type === 'advantage' && 'Advantage'}
-                      {trait.mechanical_effect.type === 'disadvantage' && 'Disadvantage'}
-                      {trait.mechanical_effect.condition &&
-                        ` (when ${trait.mechanical_effect.condition})`}
+                  {trait.mechanical_effect && trait.mechanical_effect.length > 0 && (
+                    <div className="text-sm text-accent-secondary space-y-1">
+                      <strong>Effects:</strong>
+                      {trait.mechanical_effect.map((effect, idx) => (
+                        <div key={idx} className="ml-2">
+                          • {effect.type === 'stat_modifier' &&
+                            `${effect.modifier && effect.modifier > 0 ? '+' : ''}${effect.modifier} to ${
+                              effect.stats?.join(', ') || effect.stat
+                            }`}
+                          {effect.type === 'advantage' && 'Advantage'}
+                          {effect.type === 'disadvantage' && 'Disadvantage'}
+                          {effect.type === 'rest' && 'Rest Bonus'}
+                          {effect.type === 'custom' && effect.description}
+                          {effect.condition && ` (when ${effect.condition})`}
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

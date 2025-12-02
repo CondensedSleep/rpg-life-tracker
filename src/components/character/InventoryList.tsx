@@ -109,18 +109,20 @@ export function InventoryList() {
                       Condition: <span className="capitalize">{item.condition}</span>
                     </p>
                   )}
-                  {item.passive_effect && (
-                    <div className="text-sm text-accent-secondary">
-                      <strong>Effect:</strong>{' '}
-                      {item.passive_effect.type === 'advantage' && 'Advantage'}
-                      {item.passive_effect.type === 'disadvantage' && 'Disadvantage'}
-                      {item.passive_effect.modifier &&
-                        ` ${item.passive_effect.modifier > 0 ? '+' : ''}${item.passive_effect.modifier}`}
-                      {item.passive_effect.stat && ` on ${item.passive_effect.stat}`}
-                      {item.passive_effect.condition &&
-                        ` (when ${item.passive_effect.condition})`}
-                      {item.passive_effect.description && item.passive_effect.type === 'custom' &&
-                        ` ${item.passive_effect.description}`}
+                  {item.passive_effect && item.passive_effect.length > 0 && (
+                    <div className="text-sm text-accent-secondary space-y-1">
+                      <strong>Effects:</strong>
+                      {item.passive_effect.map((effect, idx) => (
+                        <div key={idx} className="ml-2">
+                          • {effect.type === 'advantage' && 'Advantage'}
+                          {effect.type === 'disadvantage' && 'Disadvantage'}
+                          {effect.type === 'custom' && effect.description}
+                          {effect.modifier &&
+                            ` ${effect.modifier > 0 ? '+' : ''}${effect.modifier}`}
+                          {effect.stat && ` on ${effect.stat}`}
+                          {effect.condition && ` (when ${effect.condition})`}
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

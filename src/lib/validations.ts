@@ -4,30 +4,34 @@ import { z } from 'zod'
 // MECHANICAL EFFECT SCHEMA (for Traits)
 // ============================================================================
 
-export const mechanicalEffectSchema = z.object({
+export const mechanicalEffectItemSchema = z.object({
   type: z.enum(['stat_modifier', 'advantage', 'disadvantage', 'rest', 'custom']).optional(),
   stat: z.string().optional(),
   stats: z.array(z.string()).optional(),
   modifier: z.number().optional(),
   condition: z.string().optional(),
   description: z.string().optional(),
-}).optional().nullable()
+})
 
-export type MechanicalEffectFormValues = z.infer<typeof mechanicalEffectSchema>
+export const mechanicalEffectSchema = z.array(mechanicalEffectItemSchema).optional().nullable()
+
+export type MechanicalEffectFormValues = z.infer<typeof mechanicalEffectItemSchema>
 
 // ============================================================================
 // PASSIVE EFFECT SCHEMA (for Inventory)
 // ============================================================================
 
-export const passiveEffectSchema = z.object({
+export const passiveEffectItemSchema = z.object({
   stat: z.string().optional(),
   modifier: z.number().optional(),
   type: z.enum(['advantage', 'disadvantage', 'custom']).optional(),
   condition: z.string().optional(),
   description: z.string().optional(),
-}).optional().nullable()
+})
 
-export type PassiveEffectFormValues = z.infer<typeof passiveEffectSchema>
+export const passiveEffectSchema = z.array(passiveEffectItemSchema).optional().nullable()
+
+export type PassiveEffectFormValues = z.infer<typeof passiveEffectItemSchema>
 
 // ============================================================================
 // TRAIT VALIDATION SCHEMA

@@ -66,7 +66,7 @@ export interface Trait {
   trait_name: string
   trait_type: TraitType | null
   description: string | null
-  mechanical_effect: MechanicalEffect | null
+  mechanical_effect: MechanicalEffect[] | null
   is_active: boolean
   created_at: string
 }
@@ -85,7 +85,7 @@ export interface InventoryItem {
   item_name: string
   description: string | null
   item_type: ItemType | null
-  passive_effect: PassiveEffect | null
+  passive_effect: PassiveEffect[] | null
   condition: string | null
   is_equipped: boolean
   created_at: string
@@ -269,14 +269,14 @@ export interface TraitFormData {
   trait_name: string
   trait_type: TraitType
   description?: string
-  mechanical_effect?: MechanicalEffect
+  mechanical_effect?: MechanicalEffect[]
 }
 
 export interface InventoryFormData {
   item_name: string
   description?: string
   item_type: ItemType
-  passive_effect?: PassiveEffect
+  passive_effect?: PassiveEffect[]
   condition?: string
 }
 
