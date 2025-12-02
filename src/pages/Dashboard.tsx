@@ -18,10 +18,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Plus, Edit2, Trash2, RefreshCw } from 'lucide-react'
-import { deleteTrait, deleteInventoryItem } from '@/lib/supabaseService'
+import { Plus, Edit2, Trash2, RefreshCw, Moon, AlertTriangle } from 'lucide-react'
+import { deleteTrait, deleteInventoryItem, levelUpCharacter, takeLongRest as takeLongRestService } from '@/lib/supabaseService'
 import { recalculateAbilityValues } from '@/lib/abilityService'
 import { getTodayLocalDate } from '@/lib/dateUtils'
+import { loadDataFromSupabase } from '@/lib/loadSeedData'
 
 export function Dashboard() {
   const character = useCharacter()
@@ -32,6 +33,9 @@ export function Dashboard() {
   const removeTrait = useStore((state) => state.removeTrait)
   const removeInventoryItem = useStore((state) => state.removeInventoryItem)
   const levelUp = useStore((state) => state.levelUp)
+  const hitDice = useStore((state) => state.hitDice)
+  const setHitDice = useStore((state) => state.setHitDice)
+  const takeLongRest = useStore((state) => state.takeLongRest)
   const [todayRoll, setTodayRoll] = useState<DailyRoll | null>(null)
   const navigate = useNavigate()
 
@@ -100,15 +104,66 @@ export function Dashboard() {
     window.location.reload()
   }
 
-  const handleLevelUp = () => {
-    if (!selectedAbilityForLevelUp) return
+  const handleLevelUp = async () => {
+    if (!selectedAbilityForLevelUp || !character) return
+
+    console.log('🌟 Leveling up with ability:', selectedAbilityForLevelUp)
+
+    // Persist to database
+    const { error } = await levelUpCharacter(character.id, selectedAbilityForLevelUp)
+
+    if (error) {
+      console.error('Error leveling up:', error)
+      alert('Failed to level up: ' + error.message)
+      return
+    }
+
+    // Update local state
     levelUp(selectedAbilityForLevelUp)
+
+    // Reload data from database to ensure sync
+    await loadDataFromSupabase(character.user_id)
+
     setShowLevelUpModal(false)
     setSelectedAbilityForLevelUp(null)
+
+    console.log('✅ Level up complete!')
   }
 
   // Get abilities eligible for level up (used 5+ times this level)
   const eligibleAbilities = abilities.filter(a => a.times_used_this_level >= 5)
+
+  const handleTakeLongRest = async () => {
+    if (!character || !hitDice) return
+
+    const confirmRest = window.confirm(
+      `Take a long rest? This will:\n\n` +
+      `• Restore all hit dice (${hitDice.current_hit_dice}/${hitDice.max_hit_dice} → ${hitDice.max_hit_dice}/${hitDice.max_hit_dice})\n` +
+      `• Reset exhaustion level to 0\n` +
+      `${hitDice.days_at_zero >= 3 ? '⚠️ Warning: You have been at 0 hit dice for ' + hitDice.days_at_zero + ' days. This may increase exhaustion.' : ''}`
+    )
+
+    if (!confirmRest) return
+
+    console.log('🛌 Taking long rest...')
+
+    // Persist to database
+    const { data, error } = await takeLongRestService(character.id)
+
+    if (error) {
+      console.error('Error taking rest:', error)
+      alert('Failed to rest: ' + error.message)
+      return
+    }
+
+    // Update local state
+    takeLongRest()
+
+    // Reload data
+    await loadDataFromSupabase(character.user_id)
+
+    console.log('✅ Rest complete!', data)
+  }
 
   useEffect(() => {
     if (character) {
@@ -147,9 +202,9 @@ export function Dashboard() {
   return (
     <div className="container mx-auto p-4 max-w-7xl space-y-6">
       {/* ================================================================
-          SECTION 1: Character Info + Day State
+          SECTION 1: Character Info + Day State + Hit Dice
           ================================================================ */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left: Character Info + XP */}
         <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
           <div className="flex items-center justify-between mb-1">
@@ -226,6 +281,83 @@ export function Dashboard() {
               >
                 Log Daily Roll
               </button>
+            </div>
+          )}
+        </div>
+
+        {/* Third: Hit Dice & Rest */}
+        <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+          <h2 className="text-lg font-semibold mb-3">Hit Dice</h2>
+
+          {hitDice ? (
+            <div className="space-y-4">
+              {/* Hit Dice Display */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-text-secondary">Current / Max</span>
+                  <span className={`text-2xl font-bold ${
+                    hitDice.current_hit_dice === 0
+                      ? 'text-accent-primary'
+                      : hitDice.current_hit_dice <= hitDice.max_hit_dice / 3
+                        ? 'text-accent-warning'
+                        : 'text-accent-success'
+                  }`}>
+                    {hitDice.current_hit_dice} / {hitDice.max_hit_dice}
+                  </span>
+                </div>
+
+                {/* Visual Hit Dice Pips */}
+                <div className="flex gap-1 flex-wrap">
+                  {Array.from({ length: hitDice.max_hit_dice }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-6 h-6 rounded border-2 ${
+                        i < hitDice.current_hit_dice
+                          ? 'bg-accent-success border-accent-success'
+                          : 'border-border bg-bg-tertiary'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Exhaustion & Warning */}
+              {(hitDice.exhaustion_level > 0 || hitDice.days_at_zero > 0) && (
+                <div className="space-y-2">
+                  {hitDice.exhaustion_level > 0 && (
+                    <div className="flex items-center gap-2 text-accent-primary text-sm">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span>Exhaustion Level: {hitDice.exhaustion_level}</span>
+                    </div>
+                  )}
+                  {hitDice.days_at_zero > 0 && (
+                    <div className="flex items-center gap-2 text-accent-warning text-sm">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span>Days at 0: {hitDice.days_at_zero}/3</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Long Rest Button */}
+              <Button
+                onClick={handleTakeLongRest}
+                className="w-full bg-accent-secondary hover:bg-accent-secondary/80"
+                disabled={hitDice.current_hit_dice === hitDice.max_hit_dice && hitDice.exhaustion_level === 0}
+              >
+                <Moon className="w-4 h-4 mr-2" />
+                Take Long Rest
+              </Button>
+
+              {hitDice.last_long_rest && (
+                <div className="text-xs text-text-secondary text-center">
+                  Last rest: {hitDice.last_long_rest}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-text-secondary text-sm">
+              Loading hit dice...
             </div>
           )}
         </div>

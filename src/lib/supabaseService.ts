@@ -1,7 +1,7 @@
 import { supabase } from './supabase'
 import type { Trait, InventoryItem, Quest } from '@/types'
 import { recalculateAbilityValues } from './abilityService'
-import { evaluateTraitIsActive } from './calculations'
+import { evaluateTraitIsActive, calculateXPToNextLevel } from './calculations'
 
 // ============================================================================
 // TRAITS
@@ -290,4 +290,171 @@ export async function completeQuest(questId: string, characterId: string) {
   }
 
   return { data: { ...updatedQuest, xp_awarded: quest.xp_reward }, error: null }
+}
+
+// ============================================================================
+// CHARACTER LEVEL UP
+// ============================================================================
+
+export async function levelUpCharacter(characterId: string, abilityName: string) {
+  // Get current character data
+  const { data: character, error: charError } = await supabase
+    .from('characters')
+    .select('level, current_xp, xp_to_next_level')
+    .eq('id', characterId)
+    .single()
+
+  if (charError || !character) {
+    return { data: null, error: charError || new Error('Character not found') }
+  }
+
+  // Calculate new level and XP threshold
+  const newLevel = character.level + 1
+  const newXPToNext = calculateXPToNextLevel(newLevel)
+
+  // Update character level and XP threshold
+  const { error: levelUpError } = await supabase
+    .from('characters')
+    .update({
+      level: newLevel,
+      xp_to_next_level: newXPToNext,
+    })
+    .eq('id', characterId)
+
+  if (levelUpError) {
+    return { data: null, error: levelUpError }
+  }
+
+  // Get the ability to update
+  const { data: ability, error: abilityFetchError } = await supabase
+    .from('abilities')
+    .select('*')
+    .eq('character_id', characterId)
+    .eq('ability_name', abilityName)
+    .single()
+
+  if (abilityFetchError || !ability) {
+    return { data: null, error: abilityFetchError || new Error('Ability not found') }
+  }
+
+  // Update ability: increment base_value and reset times_used_this_level
+  const { error: abilityUpdateError } = await supabase
+    .from('abilities')
+    .update({
+      base_value: ability.base_value + 1,
+      times_used_this_level: 0,
+    })
+    .eq('id', ability.id)
+
+  if (abilityUpdateError) {
+    return { data: null, error: abilityUpdateError }
+  }
+
+  // Reset all other abilities' times_used_this_level
+  const { error: resetError } = await supabase
+    .from('abilities')
+    .update({ times_used_this_level: 0 })
+    .eq('character_id', characterId)
+    .neq('id', ability.id)
+
+  if (resetError) {
+    console.error('Error resetting ability usage counters:', resetError)
+  }
+
+  // Recalculate ability values (to update current_value based on new base_value)
+  await recalculateAbilityValues(characterId)
+
+  return {
+    data: {
+      newLevel,
+      newXPToNext,
+      selectedAbility: abilityName,
+    },
+    error: null,
+  }
+}
+
+// ============================================================================
+// HIT DICE / REST SYSTEM
+// ============================================================================
+
+export async function takeLongRest(characterId: string) {
+  // Get current hit dice data
+  const { data: hitDice, error: fetchError } = await supabase
+    .from('hit_dice')
+    .select('*')
+    .eq('character_id', characterId)
+    .single()
+
+  if (fetchError || !hitDice) {
+    return { data: null, error: fetchError || new Error('Hit dice not found') }
+  }
+
+  // Calculate exhaustion level based on days at zero
+  const newExhaustionLevel = hitDice.days_at_zero >= 3 ? 1 : 0
+
+  // Update hit dice: restore to max, reset exhaustion and days_at_zero
+  const { error: updateError } = await supabase
+    .from('hit_dice')
+    .update({
+      current_hit_dice: hitDice.max_hit_dice,
+      exhaustion_level: newExhaustionLevel,
+      days_at_zero: 0,
+      last_long_rest: new Date().toISOString().split('T')[0],
+    })
+    .eq('id', hitDice.id)
+
+  if (updateError) {
+    return { data: null, error: updateError }
+  }
+
+  return {
+    data: {
+      current_hit_dice: hitDice.max_hit_dice,
+      exhaustion_level: newExhaustionLevel,
+      days_at_zero: 0,
+    },
+    error: null,
+  }
+}
+
+export async function spendHitDie(characterId: string) {
+  // Get current hit dice data
+  const { data: hitDice, error: fetchError } = await supabase
+    .from('hit_dice')
+    .select('*')
+    .eq('character_id', characterId)
+    .single()
+
+  if (fetchError || !hitDice) {
+    return { data: null, error: fetchError || new Error('Hit dice not found') }
+  }
+
+  if (hitDice.current_hit_dice <= 0) {
+    return { data: null, error: new Error('No hit dice remaining') }
+  }
+
+  const newCurrent = hitDice.current_hit_dice - 1
+  const newDaysAtZero = newCurrent === 0 ? hitDice.days_at_zero + 1 : hitDice.days_at_zero
+
+  // Update hit dice
+  const { error: updateError } = await supabase
+    .from('hit_dice')
+    .update({
+      current_hit_dice: newCurrent,
+      days_at_zero: newDaysAtZero,
+    })
+    .eq('id', hitDice.id)
+
+  if (updateError) {
+    return { data: null, error: updateError }
+  }
+
+  return {
+    data: {
+      current_hit_dice: newCurrent,
+      days_at_zero: newDaysAtZero,
+    },
+    error: null,
+  }
 }
