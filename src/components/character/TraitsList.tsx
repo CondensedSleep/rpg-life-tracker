@@ -106,13 +106,28 @@ export function TraitsList() {
                       <strong>Effects:</strong>
                       {trait.mechanical_effect.map((effect, idx) => (
                         <div key={idx} className="ml-2">
-                          • {effect.type === 'stat_modifier' &&
-                            `${effect.modifier && effect.modifier > 0 ? '+' : ''}${effect.modifier} to ${
-                              effect.stats?.join(', ') || effect.stat
-                            }`}
-                          {effect.type === 'advantage' && 'Advantage'}
-                          {effect.type === 'disadvantage' && 'Disadvantage'}
-                          {effect.type === 'rest' && 'Rest Bonus'}
+                          • {effect.type === 'stat_modifier' && effect.stat_modifiers && (
+                            <span>
+                              {effect.stat_modifiers.map((sm, i) => (
+                                <span key={i}>
+                                  {i > 0 && ', '}
+                                  {sm.modifier > 0 ? '+' : ''}{sm.modifier} to {sm.stat}
+                                </span>
+                              ))}
+                            </span>
+                          )}
+                          {effect.type === 'advantage' && (
+                            <span>
+                              Advantage on {effect.affected_stats?.join(', ') || 'unknown'}
+                              {effect.modifier && ` (${effect.modifier > 0 ? '+' : ''}${effect.modifier})`}
+                            </span>
+                          )}
+                          {effect.type === 'disadvantage' && (
+                            <span>
+                              Disadvantage on {effect.affected_stats?.join(', ') || 'unknown'}
+                              {effect.modifier && ` (${effect.modifier > 0 ? '+' : ''}${effect.modifier})`}
+                            </span>
+                          )}
                           {effect.type === 'custom' && effect.description}
                           {effect.condition && ` (when ${effect.condition})`}
                         </div>

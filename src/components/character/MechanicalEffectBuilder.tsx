@@ -10,21 +10,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, X } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 interface MechanicalEffectBuilderProps {
   form: UseFormReturn<TraitFormValues>
 }
 
-// All available abilities grouped by core stat
+// All available abilities
 const ABILITIES = [
-  // Body
   'nutrition', 'strength', 'agility', 'sex',
-  // Mind
   'language', 'literature', 'research', 'openness',
-  // Heart
   'empathy', 'love', 'expression', 'drive',
-  // Soul
   'mindfulness', 'nature', 'creation', 'honesty',
 ]
 
@@ -37,8 +34,8 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
   const addEffect = () => {
     append({
       type: 'stat_modifier',
-      stat: '',
-      modifier: 0,
+      stat_modifiers: [],
+      affected_stats: [],
     })
   }
 
@@ -60,6 +57,8 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
         <div className="space-y-4">
           {fields.map((field, index) => {
             const effectType = form.watch(`mechanical_effect.${index}.type`)
+            const affectedStats = form.watch(`mechanical_effect.${index}.affected_stats`) || []
+            const statModifiers = form.watch(`mechanical_effect.${index}.stat_modifiers`) || []
 
             return (
               <div
@@ -83,9 +82,13 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
                   <Label htmlFor={`effect-type-${index}`}>Effect Type</Label>
                   <Select
                     value={effectType || ''}
-                    onValueChange={(value) =>
+                    onValueChange={(value) => {
                       form.setValue(`mechanical_effect.${index}.type`, value as any)
-                    }
+                      // Reset fields when type changes
+                      form.setValue(`mechanical_effect.${index}.stat_modifiers`, [])
+                      form.setValue(`mechanical_effect.${index}.affected_stats`, [])
+                      form.setValue(`mechanical_effect.${index}.modifier`, undefined)
+                    }}
                   >
                     <SelectTrigger id={`effect-type-${index}`}>
                       <SelectValue placeholder="Select effect type" />
@@ -94,66 +97,162 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
                       <SelectItem value="stat_modifier">Stat Modifier</SelectItem>
                       <SelectItem value="advantage">Advantage</SelectItem>
                       <SelectItem value="disadvantage">Disadvantage</SelectItem>
-                      <SelectItem value="rest">Rest Bonus</SelectItem>
                       <SelectItem value="custom">Custom</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                {/* Affected Stat (single or multiple) */}
-                <div>
-                  <Label htmlFor={`affected-stat-${index}`}>Affected Stat(s)</Label>
-                  <Input
-                    id={`affected-stat-${index}`}
-                    placeholder="e.g., creation, expression (comma-separated)"
-                    {...form.register(`mechanical_effect.${index}.stat`)}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      // If contains comma, split into array for stats field
-                      if (value.includes(',')) {
-                        const stats = value.split(',').map((s) => s.trim())
-                        form.setValue(`mechanical_effect.${index}.stats`, stats)
-                        form.setValue(`mechanical_effect.${index}.stat`, undefined)
-                      } else {
-                        form.setValue(`mechanical_effect.${index}.stat`, value)
-                        form.setValue(`mechanical_effect.${index}.stats`, undefined)
-                      }
-                    }}
-                  />
-                  <p className="text-xs text-text-secondary mt-1">
-                    Available abilities: {ABILITIES.join(', ')}
-                  </p>
-                </div>
-
-                {/* Modifier Value (for stat_modifier type) */}
+                {/* STAT MODIFIER TYPE */}
                 {effectType === 'stat_modifier' && (
-                  <div>
-                    <Label htmlFor={`modifier-${index}`}>Modifier Value</Label>
-                    <Input
-                      id={`modifier-${index}`}
-                      type="number"
-                      placeholder="e.g., 2 or -2"
-                      {...form.register(`mechanical_effect.${index}.modifier`, {
-                        valueAsNumber: true,
-                      })}
-                    />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label>Stat Modifiers (Required)</Label>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          const current = statModifiers || []
+                          form.setValue(`mechanical_effect.${index}.stat_modifiers`, [
+                            ...current,
+                            { stat: '', modifier: 0 },
+                          ])
+                        }}
+                      >
+                        <Plus className="w-3 h-3 mr-1" />
+                        Add Stat
+                      </Button>
+                    </div>
+
+                    {statModifiers.length === 0 ? (
+                      <p className="text-xs text-text-secondary italic">
+                        No stat modifiers added. Click "Add Stat" to add modifiers.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {statModifiers.map((_, modIndex) => (
+                          <div key={modIndex} className="flex gap-2 items-end">
+                            <div className="flex-1">
+                              <Label className="text-xs">Stat</Label>
+                              <Select
+                                value={form.watch(`mechanical_effect.${index}.stat_modifiers.${modIndex}.stat`) || ''}
+                                onValueChange={(value) =>
+                                  form.setValue(`mechanical_effect.${index}.stat_modifiers.${modIndex}.stat`, value)
+                                }
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select stat" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {ABILITIES.map((ability) => (
+                                    <SelectItem key={ability} value={ability}>
+                                      {ability}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="w-24">
+                              <Label className="text-xs">Modifier</Label>
+                              <Input
+                                type="number"
+                                placeholder="±#"
+                                {...form.register(`mechanical_effect.${index}.stat_modifiers.${modIndex}.modifier`, {
+                                  valueAsNumber: true,
+                                })}
+                              />
+                            </div>
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => {
+                                const current = form.getValues(`mechanical_effect.${index}.stat_modifiers`) || []
+                                form.setValue(
+                                  `mechanical_effect.${index}.stat_modifiers`,
+                                  current.filter((_, i) => i !== modIndex)
+                                )
+                              }}
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 
-                {/* Condition */}
-                <div>
-                  <Label htmlFor={`condition-${index}`}>Condition (Optional)</Label>
-                  <Input
-                    id={`condition-${index}`}
-                    placeholder="e.g., drive > 0"
-                    {...form.register(`mechanical_effect.${index}.condition`)}
-                  />
-                  <p className="text-xs text-text-secondary mt-1">
-                    When this condition is true, the effect applies
-                  </p>
-                </div>
+                {/* ADVANTAGE / DISADVANTAGE TYPE */}
+                {(effectType === 'advantage' || effectType === 'disadvantage') && (
+                  <div className="space-y-3">
+                    <div>
+                      <Label>Affected Stats (Required)</Label>
+                      <div className="mt-2 space-y-2">
+                        <Select
+                          value=""
+                          onValueChange={(value) => {
+                            const current = affectedStats || []
+                            if (!current.includes(value)) {
+                              form.setValue(`mechanical_effect.${index}.affected_stats`, [...current, value])
+                            }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select stat to add" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {ABILITIES.filter((a) => !affectedStats.includes(a)).map((ability) => (
+                              <SelectItem key={ability} value={ability}>
+                                {ability}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
 
-                {/* Custom Description (for custom type) */}
+                        {affectedStats.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {affectedStats.map((stat: string, statIndex: number) => (
+                              <Badge key={statIndex} variant="secondary" className="gap-1">
+                                {stat}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const current = form.getValues(`mechanical_effect.${index}.affected_stats`) || []
+                                    form.setValue(
+                                      `mechanical_effect.${index}.affected_stats`,
+                                      current.filter((_, i) => i !== statIndex)
+                                    )
+                                  }}
+                                  className="ml-1 hover:text-accent-primary"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor={`modifier-${index}`}>Flat Modifier (Optional)</Label>
+                      <Input
+                        id={`modifier-${index}`}
+                        type="number"
+                        placeholder="e.g., +2 or -1"
+                        {...form.register(`mechanical_effect.${index}.modifier`, {
+                          valueAsNumber: true,
+                        })}
+                      />
+                      <p className="text-xs text-text-secondary mt-1">
+                        Additional modifier beyond advantage/disadvantage
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* CUSTOM TYPE */}
                 {effectType === 'custom' && (
                   <div>
                     <Label htmlFor={`effect-description-${index}`}>
@@ -164,6 +263,21 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
                       placeholder="Describe the custom effect"
                       {...form.register(`mechanical_effect.${index}.description`)}
                     />
+                  </div>
+                )}
+
+                {/* Condition (for all types except custom) */}
+                {effectType && effectType !== 'custom' && (
+                  <div>
+                    <Label htmlFor={`condition-${index}`}>Condition (Optional)</Label>
+                    <Input
+                      id={`condition-${index}`}
+                      placeholder="e.g., drive > 0"
+                      {...form.register(`mechanical_effect.${index}.condition`)}
+                    />
+                    <p className="text-xs text-text-secondary mt-1">
+                      When this condition is true, the effect applies
+                    </p>
                   </div>
                 )}
               </div>

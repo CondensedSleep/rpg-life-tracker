@@ -114,12 +114,29 @@ export function InventoryList() {
                       <strong>Effects:</strong>
                       {item.passive_effect.map((effect, idx) => (
                         <div key={idx} className="ml-2">
-                          • {effect.type === 'advantage' && 'Advantage'}
-                          {effect.type === 'disadvantage' && 'Disadvantage'}
+                          • {effect.type === 'stat_modifier' && effect.stat_modifiers && (
+                            <span>
+                              {effect.stat_modifiers.map((sm, i) => (
+                                <span key={i}>
+                                  {i > 0 && ', '}
+                                  {sm.modifier > 0 ? '+' : ''}{sm.modifier} to {sm.stat}
+                                </span>
+                              ))}
+                            </span>
+                          )}
+                          {effect.type === 'advantage' && (
+                            <span>
+                              Advantage on {effect.affected_stats?.join(', ') || 'unknown'}
+                              {effect.modifier && ` (${effect.modifier > 0 ? '+' : ''}${effect.modifier})`}
+                            </span>
+                          )}
+                          {effect.type === 'disadvantage' && (
+                            <span>
+                              Disadvantage on {effect.affected_stats?.join(', ') || 'unknown'}
+                              {effect.modifier && ` (${effect.modifier > 0 ? '+' : ''}${effect.modifier})`}
+                            </span>
+                          )}
                           {effect.type === 'custom' && effect.description}
-                          {effect.modifier &&
-                            ` ${effect.modifier > 0 ? '+' : ''}${effect.modifier}`}
-                          {effect.stat && ` on ${effect.stat}`}
                           {effect.condition && ` (when ${effect.condition})`}
                         </div>
                       ))}
