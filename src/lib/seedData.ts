@@ -78,6 +78,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'body',
     ability_name: 'nutrition',
     initial_value: -2,
+    base_value: -2,
     current_value: -2,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -88,6 +89,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'body',
     ability_name: 'strength',
     initial_value: 0,
+    base_value: 0,
     current_value: 0,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -98,6 +100,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'body',
     ability_name: 'agility',
     initial_value: 2,
+    base_value: 2,
     current_value: 2,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -108,6 +111,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'body',
     ability_name: 'sex',
     initial_value: -1,
+    base_value: -1,
     current_value: -1,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -120,6 +124,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'mind',
     ability_name: 'language',
     initial_value: 2,
+    base_value: 2,
     current_value: 2,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -130,6 +135,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'mind',
     ability_name: 'literature',
     initial_value: 1,
+    base_value: 1,
     current_value: 1,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -140,6 +146,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'mind',
     ability_name: 'research',
     initial_value: 1,
+    base_value: 1,
     current_value: 1,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -150,6 +157,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'mind',
     ability_name: 'openness',
     initial_value: 0,
+    base_value: 0,
     current_value: 0,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -162,6 +170,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'heart',
     ability_name: 'empathy',
     initial_value: 2,
+    base_value: 2,
     current_value: 2,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -172,6 +181,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'heart',
     ability_name: 'love',
     initial_value: 0,
+    base_value: 0,
     current_value: 0,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -182,6 +192,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'heart',
     ability_name: 'expression',
     initial_value: 1,
+    base_value: 1,
     current_value: 1,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -192,6 +203,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'heart',
     ability_name: 'drive',
     initial_value: 0,
+    base_value: 0,
     current_value: 0,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -204,6 +216,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'soul',
     ability_name: 'mindfulness',
     initial_value: 1,
+    base_value: 1,
     current_value: 1,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -214,6 +227,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'soul',
     ability_name: 'nature',
     initial_value: 0,
+    base_value: 0,
     current_value: 0,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -224,6 +238,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'soul',
     ability_name: 'creation',
     initial_value: 3,
+    base_value: 3,
     current_value: 3,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -234,6 +249,7 @@ export const INITIAL_ABILITIES: Ability[] = [
     core_stat: 'soul',
     ability_name: 'honesty',
     initial_value: 1,
+    base_value: 1,
     current_value: 1,
     times_used_this_level: 0,
     total_times_used: 0,
@@ -251,12 +267,16 @@ export const INITIAL_TRAITS: Trait[] = [
     trait_name: 'ARTIST',
     trait_type: 'feature',
     description: 'Given Drive, anything is possible.',
-    mechanical_effect: {
-      type: 'stat_modifier',
-      stats: ['creation', 'expression'],
-      modifier: 2,
-      condition: 'drive > 0',
-    },
+    mechanical_effect: [
+      {
+        type: 'stat_modifier',
+        stat_modifiers: [
+          { stat: 'creation', modifier: 2 },
+          { stat: 'expression', modifier: 2 }
+        ],
+        condition: 'drive > 0',
+      }
+    ],
     is_active: true,
     created_at: new Date().toISOString(),
   },
@@ -266,12 +286,17 @@ export const INITIAL_TRAITS: Trait[] = [
     trait_name: 'ADDICT',
     trait_type: 'flaw',
     description: 'Concerns: Honesty, Nutrition, Mindfulness',
-    mechanical_effect: {
-      type: 'stat_modifier',
-      stats: ['drive', 'agility', 'honesty'],
-      modifier: -2,
-      condition: 'always',
-    },
+    mechanical_effect: [
+      {
+        type: 'stat_modifier',
+        stat_modifiers: [
+          { stat: 'drive', modifier: -2 },
+          { stat: 'agility', modifier: -2 },
+          { stat: 'honesty', modifier: -2 }
+        ],
+        condition: 'always',
+      }
+    ],
     is_active: true,
     created_at: new Date().toISOString(),
   },
@@ -281,12 +306,15 @@ export const INITIAL_TRAITS: Trait[] = [
     trait_name: 'STARGAZER',
     trait_type: 'feature',
     description: 'Drawn to the deepest, scariest questions',
-    mechanical_effect: {
-      type: 'stat_modifier',
-      stat: 'openness',
-      modifier: 2,
-      condition: 'always',
-    },
+    mechanical_effect: [
+      {
+        type: 'stat_modifier',
+        stat_modifiers: [
+          { stat: 'openness', modifier: 2 }
+        ],
+        condition: 'always',
+      }
+    ],
     is_active: true,
     created_at: new Date().toISOString(),
   },
@@ -314,11 +342,13 @@ export const INITIAL_INVENTORY: InventoryItem[] = [
     item_name: '2019 MacBook Pro',
     description: 'worn',
     item_type: 'tool',
-    passive_effect: {
-      stat: 'creation',
-      type: 'advantage',
-      condition: 'nutrition > 0',
-    },
+    passive_effect: [
+      {
+        type: 'advantage',
+        affected_stats: ['creation'],
+        condition: 'nutrition > 0',
+      }
+    ],
     condition: 'worn',
     is_equipped: true,
     created_at: new Date().toISOString(),
@@ -329,11 +359,15 @@ export const INITIAL_INVENTORY: InventoryItem[] = [
     item_name: 'Disposable Vape',
     description: 'toxic',
     item_type: 'debuff',
-    passive_effect: {
-      stat: 'honesty',
-      modifier: -1,
-      condition: 'always',
-    },
+    passive_effect: [
+      {
+        type: 'stat_modifier',
+        stat_modifiers: [
+          { stat: 'honesty', modifier: -1 }
+        ],
+        condition: 'always',
+      }
+    ],
     condition: 'toxic',
     is_equipped: true,
     created_at: new Date().toISOString(),
@@ -377,10 +411,12 @@ export const INITIAL_INVENTORY: InventoryItem[] = [
     item_name: 'Ancient Casio Privia',
     description: 'worn, reliable',
     item_type: 'comfort',
-    passive_effect: {
-      type: 'custom',
-      description: 'Playing for 30min = regain 1 Hit Die (once per day)',
-    },
+    passive_effect: [
+      {
+        type: 'custom',
+        description: 'Playing for 30min = regain 1 Hit Die (once per day)',
+      }
+    ],
     condition: 'worn',
     is_equipped: true,
     created_at: new Date().toISOString(),
@@ -401,11 +437,18 @@ export const INITIAL_QUESTS: Quest[] = [
     abilities_used: ['creation', 'expression'],
     xp_reward: 3,
     difficulty_class: null,
-    progression_milestone: {
-      ability: 'creation',
-      every: 5,
-      gain: 1,
-    },
+    progression_milestone: [
+      {
+        ability: 'creation',
+        every: 5,
+        gain: 1,
+      },
+      {
+        ability: 'expression',
+        every: 10,
+        gain: 1,
+      }
+    ],
     times_completed: 0,
     description: 'Page of lyrics OR Song excerpt/material',
     deadline: null,
@@ -421,11 +464,18 @@ export const INITIAL_QUESTS: Quest[] = [
     abilities_used: ['drive', 'strength'],
     xp_reward: 4,
     difficulty_class: null,
-    progression_milestone: {
-      ability: 'drive',
-      every: 5,
-      gain: 1,
-    },
+    progression_milestone: [
+      {
+        ability: 'drive',
+        every: 5,
+        gain: 1,
+      },
+      {
+        ability: 'strength',
+        every: 10,
+        gain: 1,
+      }
+    ],
     times_completed: 0,
     description: 'Workout OR Do 20 Push-ups',
     deadline: null,
@@ -441,11 +491,18 @@ export const INITIAL_QUESTS: Quest[] = [
     abilities_used: ['nature', 'agility'],
     xp_reward: 3,
     difficulty_class: null,
-    progression_milestone: {
-      ability: 'nature',
-      every: 5,
-      gain: 1,
-    },
+    progression_milestone: [
+      {
+        ability: 'nature',
+        every: 5,
+        gain: 1,
+      },
+      {
+        ability: 'agility',
+        every: 10,
+        gain: 1,
+      }
+    ],
     times_completed: 0,
     description: 'Go on a hike OR Walk around the block',
     deadline: null,
@@ -461,11 +518,13 @@ export const INITIAL_QUESTS: Quest[] = [
     abilities_used: ['literature'],
     xp_reward: 2,
     difficulty_class: null,
-    progression_milestone: {
-      ability: 'literature',
-      every: 10,
-      gain: 1,
-    },
+    progression_milestone: [
+      {
+        ability: 'literature',
+        every: 10,
+        gain: 1,
+      }
+    ],
     times_completed: 0,
     description: 'Read for at least one hour',
     deadline: null,
@@ -481,11 +540,13 @@ export const INITIAL_QUESTS: Quest[] = [
     abilities_used: ['empathy'],
     xp_reward: 3,
     difficulty_class: null,
-    progression_milestone: {
-      ability: 'empathy',
-      every: 5,
-      gain: 1,
-    },
+    progression_milestone: [
+      {
+        ability: 'empathy',
+        every: 5,
+        gain: 1,
+      }
+    ],
     times_completed: 0,
     description: 'Text or talk to a friend or loved one',
     deadline: null,
@@ -501,11 +562,13 @@ export const INITIAL_QUESTS: Quest[] = [
     abilities_used: ['nutrition'],
     xp_reward: 2,
     difficulty_class: null,
-    progression_milestone: {
-      ability: 'nutrition',
-      every: 7,
-      gain: 1,
-    },
+    progression_milestone: [
+      {
+        ability: 'nutrition',
+        every: 7,
+        gain: 1,
+      }
+    ],
     times_completed: 0,
     description: 'Cook a meal from scratch',
     deadline: null,

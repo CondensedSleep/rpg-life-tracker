@@ -50,7 +50,6 @@ export const traitFormSchema = z.object({
   }),
   description: z.string().optional(),
   mechanical_effect: mechanicalEffectSchema,
-  is_active: z.boolean().default(true),
 })
 
 export type TraitFormValues = z.infer<typeof traitFormSchema>

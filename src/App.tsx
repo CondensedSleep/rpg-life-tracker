@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -8,15 +7,8 @@ import { Quests } from './pages/Quests'
 import { Journal } from './pages/Journal'
 import { Stats } from './pages/Stats'
 import { Auth } from './pages/Auth'
-import { loadSeedData } from './lib/loadSeedData'
 
 function App() {
-  useEffect(() => {
-    // Load seed data on app initialization
-    // This will be called after authentication
-    loadSeedData()
-  }, [])
-
   return (
     <BrowserRouter>
       <AuthProvider>

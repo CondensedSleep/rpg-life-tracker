@@ -269,14 +269,16 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
                 {/* Condition (for all types except custom) */}
                 {effectType && effectType !== 'custom' && (
                   <div>
-                    <Label htmlFor={`condition-${index}`}>Condition (Optional)</Label>
+                    <Label htmlFor={`condition-${index}`}>
+                      Condition <span className="text-text-secondary">(determines if trait is active)</span>
+                    </Label>
                     <Input
                       id={`condition-${index}`}
-                      placeholder="e.g., drive > 0"
+                      placeholder="e.g., drive > 0, always"
                       {...form.register(`mechanical_effect.${index}.condition`)}
                     />
                     <p className="text-xs text-text-secondary mt-1">
-                      When this condition is true, the effect applies
+                      Trait is active when this condition is true. Use "always" for traits that are always active, or expressions like "drive &gt; 0"
                     </p>
                   </div>
                 )}

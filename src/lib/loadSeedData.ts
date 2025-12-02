@@ -10,17 +10,29 @@ import {
 } from './seedData'
 import { migrateEffectsToArrays } from './migrations/migrateEffectsToArrays'
 
+// Flag to prevent duplicate loads during React StrictMode double-render
+let isLoading = false
+
 /**
  * Load seed data into Supabase for a new user
  * This creates the initial character with all stats, abilities, traits, and inventory
  */
 export async function loadSeedData() {
+  // Prevent duplicate loads
+  if (isLoading) {
+    console.log('⏳ Already loading seed data, skipping duplicate call...')
+    return
+  }
+
+  isLoading = true
+
   try {
     // Get the current user
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
       console.log('⚠️ No authenticated user found, skipping seed data load')
+      isLoading = false
       return
     }
 
@@ -33,6 +45,8 @@ export async function loadSeedData() {
 
     if (checkError) {
       console.error('Error checking for existing character:', checkError)
+      isLoading = false
+      return
     }
 
     if (existingCharacter) {
@@ -43,6 +57,7 @@ export async function loadSeedData() {
       await migrateEffectsToArrays()
 
       await loadDataFromSupabase(user.id)
+      isLoading = false
       return
     }
 
@@ -64,19 +79,26 @@ export async function loadSeedData() {
 
     if (charError || !character) {
       console.error('Error creating character:', charError)
+      isLoading = false
       return
     }
 
     // Insert core stats
-    const coreStatsData = Object.entries(INITIAL_CORE_STATS).map(([statName, stat]) => ({
+    const coreStatsData = INITIAL_CORE_STATS.map(stat => ({
       character_id: character.id,
-      stat_name: statName,
+      stat_name: stat.stat_name,
       base_value: stat.base_value,
       current_value: stat.current_value,
       modifier: stat.modifier,
     }))
 
-    await supabase.from('core_stats').insert(coreStatsData)
+    const { error: coreStatsError } = await supabase.from('core_stats').insert(coreStatsData)
+    
+    if (coreStatsError) {
+      console.error('Error inserting core stats:', coreStatsError)
+      isLoading = false
+      return
+    }
 
     // Insert abilities
     const abilitiesData = INITIAL_ABILITIES.map(ability => ({
@@ -84,12 +106,19 @@ export async function loadSeedData() {
       core_stat: ability.core_stat,
       ability_name: ability.ability_name,
       initial_value: ability.initial_value,
+      base_value: ability.base_value,
       current_value: ability.current_value,
       times_used_this_level: ability.times_used_this_level,
       total_times_used: ability.total_times_used,
     }))
 
-    await supabase.from('abilities').insert(abilitiesData)
+    const { error: abilitiesError } = await supabase.from('abilities').insert(abilitiesData)
+    
+    if (abilitiesError) {
+      console.error('Error inserting abilities:', abilitiesError)
+      isLoading = false
+      return
+    }
 
     // Insert traits
     const traitsData = INITIAL_TRAITS.map(trait => ({
@@ -160,9 +189,11 @@ export async function loadSeedData() {
 
     // Load into store
     await loadDataFromSupabase(user.id)
+    isLoading = false
 
   } catch (error) {
     console.error('Error loading seed data:', error)
+    isLoading = false
   }
 }
 

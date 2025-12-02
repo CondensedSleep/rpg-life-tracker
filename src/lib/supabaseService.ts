@@ -1,43 +1,112 @@
 import { supabase } from './supabase'
 import type { Trait, InventoryItem, Quest } from '@/types'
+import { recalculateAbilityValues } from './abilityService'
+import { evaluateTraitIsActive } from './calculations'
 
 // ============================================================================
 // TRAITS
 // ============================================================================
 
 export async function createTrait(characterId: string, trait: Partial<Trait>) {
+  // Fetch abilities to evaluate trait conditions
+  const { data: abilities } = await supabase
+    .from('abilities')
+    .select('*')
+    .eq('character_id', characterId)
+
+  // Calculate is_active based on conditions
+  const traitToInsert = {
+    character_id: characterId,
+    trait_name: trait.trait_name,
+    trait_type: trait.trait_type,
+    description: trait.description,
+    mechanical_effect: trait.mechanical_effect,
+  }
+
+  // Evaluate if trait should be active
+  const isActive = abilities && abilities.length > 0
+    ? evaluateTraitIsActive(traitToInsert as Trait, abilities)
+    : true // Default to true if no abilities yet
+
   const { data, error } = await supabase
     .from('traits')
     .insert([{
-      character_id: characterId,
-      trait_name: trait.trait_name,
-      trait_type: trait.trait_type,
-      description: trait.description,
-      mechanical_effect: trait.mechanical_effect,
-      is_active: trait.is_active ?? true,
+      ...traitToInsert,
+      is_active: isActive,
     }])
     .select()
     .single()
+
+  // Recalculate ability values if trait has mechanical effects
+  if (data && !error && trait.mechanical_effect) {
+    await recalculateAbilityValues(characterId)
+  }
 
   return { data, error }
 }
 
 export async function updateTrait(traitId: string, updates: Partial<Trait>) {
+  // Get the trait first to access character_id
+  const { data: existingTrait } = await supabase
+    .from('traits')
+    .select('character_id')
+    .eq('id', traitId)
+    .single()
+
+  if (!existingTrait) {
+    return { data: null, error: new Error('Trait not found') }
+  }
+
+  // Fetch abilities to evaluate trait conditions
+  const { data: abilities } = await supabase
+    .from('abilities')
+    .select('*')
+    .eq('character_id', existingTrait.character_id)
+
+  // Calculate is_active based on conditions
+  const traitUpdates = { ...updates }
+
+  // Evaluate if trait should be active (if mechanical_effect is being updated)
+  if (abilities && abilities.length > 0) {
+    const isActive = evaluateTraitIsActive(
+      { ...existingTrait, ...traitUpdates } as Trait,
+      abilities
+    )
+    traitUpdates.is_active = isActive
+  }
+
   const { data, error } = await supabase
     .from('traits')
-    .update(updates)
+    .update(traitUpdates)
     .eq('id', traitId)
     .select()
     .single()
+
+  // Recalculate ability values when trait is modified
+  if (data && !error) {
+    await recalculateAbilityValues(data.character_id)
+  }
 
   return { data, error }
 }
 
 export async function deleteTrait(traitId: string) {
+  // Get character_id before deleting
+  const { data: trait } = await supabase
+    .from('traits')
+    .select('character_id')
+    .eq('id', traitId)
+    .single()
+
   const { error } = await supabase
     .from('traits')
     .delete()
     .eq('id', traitId)
+
+  // Recalculate ability values after trait deletion
+  if (!error && trait) {
+    await recalculateAbilityValues(trait.character_id)
+  }
 
   return { error }
 }
@@ -61,6 +130,11 @@ export async function createInventoryItem(characterId: string, item: Partial<Inv
     .select()
     .single()
 
+  // Recalculate ability values if item has passive effects
+  if (data && !error && item.passive_effect) {
+    await recalculateAbilityValues(characterId)
+  }
+
   return { data, error }
 }
 
@@ -72,14 +146,31 @@ export async function updateInventoryItem(itemId: string, updates: Partial<Inven
     .select()
     .single()
 
+  // Recalculate ability values when item is modified (especially is_equipped)
+  if (data && !error) {
+    await recalculateAbilityValues(data.character_id)
+  }
+
   return { data, error }
 }
 
 export async function deleteInventoryItem(itemId: string) {
+  // Get character_id before deleting
+  const { data: item } = await supabase
+    .from('inventory')
+    .select('character_id')
+    .eq('id', itemId)
+    .single()
+
   const { error } = await supabase
     .from('inventory')
     .delete()
     .eq('id', itemId)
+
+  // Recalculate ability values after item deletion
+  if (!error && item) {
+    await recalculateAbilityValues(item.character_id)
+  }
 
   return { error }
 }

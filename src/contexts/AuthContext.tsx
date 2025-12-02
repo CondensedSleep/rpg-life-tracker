@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import type { User, Session, AuthError } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
+import { loadSeedData } from '@/lib/loadSeedData'
 
 interface AuthContextType {
   user: User | null
@@ -24,6 +25,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
+      
+      // Load seed data if user is authenticated
+      if (session?.user) {
+        loadSeedData()
+      }
     })
 
     // Listen for auth changes
@@ -33,6 +39,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
+      
+      // Load seed data when user signs in
+      if (session?.user) {
+        loadSeedData()
+      }
     })
 
     return () => subscription.unsubscribe()

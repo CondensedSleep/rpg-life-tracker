@@ -18,6 +18,20 @@ interface MigrationResult {
 }
 
 export async function migrateEffectsToArrays(): Promise<MigrationResult> {
+  // Check if migration has already been run
+  const migrationKey = 'rpg_life_tracker_effects_migration_v1'
+  const migrationComplete = localStorage.getItem(migrationKey)
+
+  if (migrationComplete === 'true') {
+    console.log('✅ Effects migration already completed, skipping...')
+    return {
+      success: true,
+      traitsUpdated: 0,
+      inventoryUpdated: 0,
+      errors: [],
+    }
+  }
+
   const result: MigrationResult = {
     success: true,
     traitsUpdated: 0,
@@ -124,6 +138,8 @@ export async function migrateEffectsToArrays(): Promise<MigrationResult> {
       result.success = false
     } else {
       console.log('\n✨ Migration completed successfully!')
+      // Mark migration as complete
+      localStorage.setItem('rpg_life_tracker_effects_migration_v1', 'true')
     }
   } catch (error) {
     result.success = false

@@ -1,11 +1,97 @@
-import { useCharacter, useCoreStats, useAbilities } from '@/store'
-import { TraitsList } from '@/components/character/TraitsList'
-import { InventoryList } from '@/components/character/InventoryList'
+import { useEffect, useState } from 'react'
+import { useCharacter, useCoreStats, useAbilities, useStore } from '@/store'
+import { calculateTotalModifier } from '@/lib/calculations'
+import { getDailyRoll } from '@/lib/journalService'
+import { useNavigate } from 'react-router-dom'
+import type { DailyRoll, CoreStatName, Trait, InventoryItem } from '@/types'
+import { TraitForm } from '@/components/character/TraitForm'
+import { InventoryForm } from '@/components/character/InventoryForm'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { Plus, Edit2, Trash2, RefreshCw } from 'lucide-react'
+import { deleteTrait, deleteInventoryItem } from '@/lib/supabaseService'
+import { recalculateAbilityValues } from '@/lib/abilityService'
+import { getTodayLocalDate } from '@/lib/dateUtils'
 
 export function Dashboard() {
   const character = useCharacter()
   const coreStats = useCoreStats()
   const abilities = useAbilities()
+  const traits = useStore((state) => state.traits)
+  const inventory = useStore((state) => state.inventory)
+  const removeTrait = useStore((state) => state.removeTrait)
+  const removeInventoryItem = useStore((state) => state.removeInventoryItem)
+  const [todayRoll, setTodayRoll] = useState<DailyRoll | null>(null)
+  const navigate = useNavigate()
+
+  // Trait modals
+  const [isCreatingTrait, setIsCreatingTrait] = useState(false)
+  const [editingTrait, setEditingTrait] = useState<Trait | null>(null)
+  const [deletingTraitId, setDeletingTraitId] = useState<string | null>(null)
+
+  // Inventory modals
+  const [isCreatingInventory, setIsCreatingInventory] = useState(false)
+  const [editingInventory, setEditingInventory] = useState<InventoryItem | null>(null)
+  const [deletingInventoryId, setDeletingInventoryId] = useState<string | null>(null)
+
+  const today = getTodayLocalDate()
+
+  // Debug: Log trait statuses and abilities
+  useEffect(() => {
+    if (traits.length > 0 && abilities.length > 0) {
+      console.log('📊 Dashboard loaded - Trait statuses:')
+      traits.forEach(trait => {
+        console.log(`  ${trait.trait_name}: is_active=${trait.is_active}`, trait.mechanical_effect)
+      })
+      console.log('📊 Current abilities:')
+      const driveAbility = abilities.find(a => a.ability_name === 'drive')
+      console.log(`  drive: ${driveAbility?.current_value}`)
+    }
+  }, [traits, abilities])
+
+  const handleDeleteTrait = async () => {
+    if (!deletingTraitId) return
+    const { error } = await deleteTrait(deletingTraitId)
+    if (!error) {
+      removeTrait(deletingTraitId)
+      setDeletingTraitId(null)
+    }
+  }
+
+  const handleDeleteInventory = async () => {
+    if (!deletingInventoryId) return
+    const { error } = await deleteInventoryItem(deletingInventoryId)
+    if (!error) {
+      removeInventoryItem(deletingInventoryId)
+      setDeletingInventoryId(null)
+    }
+  }
+
+  const handleManualRecalculation = async () => {
+    if (!character) return
+    console.log('🔄 Manually triggering recalculation...')
+    await recalculateAbilityValues(character.id)
+    // Force re-fetch of data by navigating
+    window.location.reload()
+  }
+
+  useEffect(() => {
+    if (character) {
+      getDailyRoll(character.id, today).then(({ data }) => {
+        setTodayRoll(data)
+      })
+    }
+  }, [character, today])
 
   if (!character || !coreStats) {
     return (
@@ -15,63 +101,457 @@ export function Dashboard() {
     )
   }
 
+  const dayStateInfo = {
+    difficult: { label: 'Difficult Terrain', emoji: '⚠️', color: 'text-accent-primary' },
+    normal: { label: 'Normal Day', emoji: '📅', color: 'text-text-primary' },
+    inspiration: { label: 'Inspiration', emoji: '✨', color: 'text-accent-success' },
+    critical: { label: 'Critical Day', emoji: '🌟', color: 'text-accent-warning' },
+  }
+
+  const currentDayInfo = todayRoll 
+    ? dayStateInfo[todayRoll.day_state]
+    : null
+
+  // Group abilities by core stat for aligned display
+  const statOrder: CoreStatName[] = ['body', 'mind', 'heart', 'soul']
+  const abilitiesByCoreStat = statOrder.map(statName => ({
+    stat: statName,
+    abilities: abilities.filter(a => a.core_stat === statName)
+  }))
+
   return (
-    <div className="container mx-auto p-4 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">{character.name}</h1>
-        <p className="text-text-secondary">{character.class} • Level {character.level}</p>
-      </div>
-
-      {/* XP Progress */}
-      <div className="mb-8 p-4 bg-bg-secondary rounded-lg border border-border frosted">
-        <div className="flex justify-between mb-2">
-          <span>XP: {character.current_xp} / {character.xp_to_next_level}</span>
-          <span>Next Level: {character.level + 1}</span>
-        </div>
-        <div className="w-full bg-bg-tertiary rounded-full h-2">
-          <div
-            className="bg-accent-primary h-2 rounded-full transition-all"
-            style={{
-              width: `${(character.current_xp / character.xp_to_next_level) * 100}%`,
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Core Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {Object.entries(coreStats).map(([statName, stat]) => (
-          <div key={statName} className="p-4 bg-bg-secondary rounded-lg border border-border frosted">
-            <h3 className="text-xl font-bold uppercase mb-2">{statName}</h3>
-            <div className="text-3xl font-bold text-accent-secondary mb-4">
-              {stat.current_value}
-              <span className="text-sm text-text-secondary ml-2">
-                ({stat.modifier >= 0 ? '+' : ''}{stat.modifier})
-              </span>
+    <div className="container mx-auto p-4 max-w-7xl space-y-6">
+      {/* ================================================================
+          SECTION 1: Character Info + Day State
+          ================================================================ */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Left: Character Info + XP */}
+        <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+          <div className="flex items-center justify-between mb-1">
+            <h1 className="text-3xl font-bold">{character.name}</h1>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleManualRecalculation}
+              title="Recalculate trait statuses"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+          </div>
+          <p className="text-text-secondary mb-4">
+            {character.class} • Level {character.level}
+          </p>
+          
+          {/* XP Progress */}
+          <div>
+            <div className="flex justify-between text-sm mb-2">
+              <span>XP: {character.current_xp} / {character.xp_to_next_level}</span>
+              <span className="text-text-secondary">Next Level: {character.level + 1}</span>
             </div>
-
-            {/* Abilities for this stat */}
-            <div className="space-y-1">
-              {abilities
-                .filter((a) => a.core_stat === statName)
-                .map((ability) => (
-                  <div key={ability.id} className="flex justify-between text-sm">
-                    <span className="capitalize">{ability.ability_name}</span>
-                    <span className="text-accent-secondary">
-                      {ability.current_value >= 0 ? '+' : ''}{ability.current_value}
-                    </span>
-                  </div>
-                ))}
+            <div className="w-full bg-bg-tertiary rounded-full h-3">
+              <div
+                className="bg-accent-primary h-3 rounded-full transition-all duration-300"
+                style={{
+                  width: `${Math.min((character.current_xp / character.xp_to_next_level) * 100, 100)}%`,
+                }}
+              />
             </div>
           </div>
-        ))}
+        </div>
+
+        {/* Right: Day State */}
+        <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+          <h2 className="text-lg font-semibold mb-3">Today's State</h2>
+          
+          {todayRoll && currentDayInfo ? (
+            <div>
+              <div className={`text-2xl font-bold mb-2 ${currentDayInfo.color}`}>
+                {currentDayInfo.emoji} {currentDayInfo.label}
+              </div>
+              <div className="text-sm text-text-secondary space-y-1">
+                <div>Roll: {todayRoll.roll_value}</div>
+                {todayRoll.day_state === 'difficult' && todayRoll.affected_stats && (
+                  <div>Disadvantage on: <span className="uppercase">{todayRoll.affected_stats.join(', ')}</span></div>
+                )}
+                {todayRoll.day_state === 'inspiration' && todayRoll.affected_stats && todayRoll.affected_stats[0] && (
+                  <div>Advantage on: <span className="uppercase">{todayRoll.affected_stats[0]}</span></div>
+                )}
+                {todayRoll.day_state === 'critical' && (
+                  <div className="text-accent-warning">XP multiplier: 2x</div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div className="text-text-secondary mb-3">No daily roll logged yet</div>
+              <button
+                onClick={() => navigate('/journal')}
+                className="px-4 py-2 bg-accent-secondary text-white rounded-md hover:bg-accent-secondary/80 transition-colors"
+              >
+                Log Daily Roll
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Traits & Inventory */}
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TraitsList />
-        <InventoryList />
+      {/* ================================================================
+          SECTION 2: Stats + Abilities + Traits + Inventory (4 columns)
+          ================================================================ */}
+      <div className="grid grid-cols-1 lg:grid-cols-20 gap-4">
+        {/* Columns 1-2: Core Stats + Abilities (40% total width) */}
+        <div className="lg:col-span-8 flex gap-4">
+          {/* Core Stats Column */}
+          <div className="flex-none w-[37.5%] space-y-3">
+            {statOrder.map(statName => {
+              const stat = coreStats[statName]
+              if (!stat) return null
+              
+              return (
+                <div
+                  key={statName}
+                  className="p-4 bg-bg-secondary rounded-lg border border-border frosted text-center flex flex-col justify-center"
+                  style={{ height: '120px' }}
+                >
+                  <div className="text-xs uppercase font-bold text-text-secondary mb-1">
+                    {statName}
+                  </div>
+                  <div className="text-3xl font-bold text-accent-secondary">
+                    {stat.current_value}
+                  </div>
+                  <div className="text-sm text-text-secondary">
+                    ({stat.modifier >= 0 ? '+' : ''}{stat.modifier})
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Abilities Column */}
+          <div className="flex-1 space-y-3">
+            {abilitiesByCoreStat.map(({ stat, abilities: statAbilities }) => (
+              <div
+                key={stat}
+                className="p-4 bg-bg-secondary rounded-lg border border-border frosted flex items-center"
+                style={{ height: '120px' }}
+              >
+                <div className="w-full space-y-1">
+                  {statAbilities.map(ability => {
+                    // Calculate total modifier with traits and inventory effects
+                    const modifierCalc = calculateTotalModifier(
+                      ability.ability_name,
+                      ability.base_value,
+                      abilities,
+                      traits,
+                      inventory,
+                      {
+                        state: todayRoll?.day_state || 'normal',
+                        affectedStats: todayRoll?.affected_stats || [],
+                        selectedStat: todayRoll?.affected_stats?.[0],
+                      }
+                    )
+
+                    const displayValue = modifierCalc.total
+                    const hasModifiers = modifierCalc.breakdown.length > 1
+
+                    return (
+                      <div key={ability.id} className="flex justify-between text-sm">
+                        <span className="uppercase text-xs text-text-secondary">
+                          {ability.ability_name}
+                        </span>
+                        <span
+                          className="font-semibold text-accent-secondary"
+                          title={
+                            hasModifiers
+                              ? modifierCalc.breakdown
+                                  .map((b) => `${b.source}: ${b.value >= 0 ? '+' : ''}${b.value}`)
+                                  .join('\n')
+                              : undefined
+                          }
+                        >
+                          {displayValue >= 0 ? '+' : ''}{displayValue}
+                          {hasModifiers && (
+                            <span className="text-accent-warning ml-1" title="Modified by traits/items">
+                              *
+                            </span>
+                          )}
+                          {modifierCalc.hasAdvantage && (
+                            <span className="text-accent-success ml-1" title="Has advantage">
+                              ↑
+                            </span>
+                          )}
+                          {modifierCalc.hasDisadvantage && (
+                            <span className="text-accent-primary ml-1" title="Has disadvantage">
+                              ↓
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Column 3: Traits (6 cols = 30% width) */}
+        <div className="lg:col-span-6">
+          <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted h-full">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold">Traits</h3>
+              <Button size="sm" onClick={() => setIsCreatingTrait(true)}>
+                <Plus className="w-4 h-4 mr-1" />
+                Add
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {traits.length === 0 ? (
+                <p className="text-sm text-text-secondary">No traits yet</p>
+              ) : (
+                traits.map(trait => (
+                  <div key={trait.id} className="text-sm group hover:bg-bg-tertiary/50 p-2 -mx-2 rounded transition-colors">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold uppercase">{trait.trait_name}</span>
+                          <span className="text-xs text-text-secondary capitalize">({trait.trait_type})</span>
+                          <span className={`text-xs ${trait.is_active ? 'text-accent-success' : 'text-text-secondary'}`}>
+                            {trait.is_active ? '●' : '○'}
+                          </span>
+                        </div>
+                        {trait.description && (
+                          <p className="text-xs text-text-secondary mt-0.5">{trait.description}</p>
+                        )}
+                        {trait.mechanical_effect && trait.mechanical_effect.length > 0 && (
+                          <div className="text-xs text-accent-secondary mt-1">
+                            {trait.mechanical_effect.map((effect, idx) => (
+                              <div key={idx}>
+                                {effect.type === 'stat_modifier' && effect.stat_modifiers && (
+                                  <span>
+                                    {effect.stat_modifiers.map((sm, i) => (
+                                      <span key={i}>
+                                        {i > 0 && ', '}
+                                        {sm.modifier > 0 ? '+' : ''}{sm.modifier} <span className="uppercase">{sm.stat}</span>
+                                      </span>
+                                    ))}
+                                  </span>
+                                )}
+                                {effect.type === 'advantage' && (
+                                  <span>Advantage on <span className="uppercase">{effect.affected_stats?.join(', ')}</span></span>
+                                )}
+                                {effect.type === 'disadvantage' && (
+                                  <span>Disadvantage on <span className="uppercase">{effect.affected_stats?.join(', ')}</span></span>
+                                )}
+                                {effect.condition && (
+                                  <span className="text-text-secondary italic"> ({effect.condition})</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-6 w-6"
+                          onClick={() => setEditingTrait(trait)}
+                        >
+                          <Edit2 className="w-3 h-3" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-6 w-6"
+                          onClick={() => setDeletingTraitId(trait.id)}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Column 4: Inventory (6 cols = 30% width) */}
+        <div className="lg:col-span-6">
+          <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted h-full">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold">Inventory</h3>
+              <Button size="sm" onClick={() => setIsCreatingInventory(true)}>
+                <Plus className="w-4 h-4 mr-1" />
+                Add
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {inventory.length === 0 ? (
+                <p className="text-sm text-text-secondary">No items yet</p>
+              ) : (
+                inventory.filter(item => item.is_equipped).map(item => (
+                  <div key={item.id} className="text-sm group hover:bg-bg-tertiary/50 p-2 -mx-2 rounded transition-colors">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">{item.item_name}</span>
+                          <span className="text-xs text-text-secondary capitalize">({item.item_type})</span>
+                        </div>
+                        {item.description && (
+                          <p className="text-xs text-text-secondary mt-0.5">{item.description}</p>
+                        )}
+                                                {item.description && (
+                          <p className="text-xs text-text-secondary mt-0.5">{item.description}</p>
+                        )}
+                        {item.passive_effect && item.passive_effect.length > 0 && (
+                          <div className="text-xs text-accent-secondary mt-1">
+                            {item.passive_effect.map((effect, idx) => (
+                              <div key={idx}>
+                                {effect.type === 'stat_modifier' && effect.stat_modifiers && (
+                                  <span>
+                                    {effect.stat_modifiers.map((sm, i) => (
+                                      <span key={i}>
+                                        {i > 0 && ', '}
+                                        {sm.modifier > 0 ? '+' : ''}{sm.modifier} <span className="uppercase">{sm.stat}</span>
+                                      </span>
+                                    ))}
+                                  </span>
+                                )}
+                                {effect.type === 'advantage' && (
+                                  <span>Advantage on <span className="uppercase">{effect.affected_stats?.join(', ')}</span></span>
+                                )}
+                                {effect.type === 'disadvantage' && (
+                                  <span>Disadvantage on <span className="uppercase">{effect.affected_stats?.join(', ')}</span></span>
+                                )}
+                                {effect.condition && (
+                                  <span className="text-text-secondary italic"> ({effect.condition})</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {item.condition && (
+                          <p className="text-xs text-text-secondary italic mt-1">Active: {item.condition}</p>
+                        )}
+                      </div>
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-6 w-6"
+                          onClick={() => setEditingInventory(item)}
+                        >
+                          <Edit2 className="w-3 h-3" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-6 w-6"
+                          onClick={() => setDeletingInventoryId(item.id)}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* ================================================================
+          SECTION 3: Quick Log Form
+          ================================================================ */}
+      <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+        <h2 className="text-xl font-semibold mb-4">Quick Log</h2>
+        <div className="text-text-secondary text-center py-8">
+          <p className="mb-4">Log rolls and actions without navigating to the journal</p>
+          <p className="text-sm italic">Quick log form coming soon...</p>
+          <button
+            onClick={() => navigate('/journal')}
+            className="mt-4 px-6 py-2 bg-accent-secondary text-white rounded-md hover:bg-accent-secondary/80 transition-colors"
+          >
+            Go to Journal
+          </button>
+        </div>
+      </div>
+
+      {/* Trait Modals */}
+      <Dialog open={isCreatingTrait} onOpenChange={setIsCreatingTrait}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Trait</DialogTitle>
+          </DialogHeader>
+          <TraitForm onClose={() => setIsCreatingTrait(false)} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!editingTrait} onOpenChange={(open) => !open && setEditingTrait(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Trait</DialogTitle>
+          </DialogHeader>
+          {editingTrait && (
+            <TraitForm trait={editingTrait} onClose={() => setEditingTrait(null)} />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deletingTraitId} onOpenChange={(open) => !open && setDeletingTraitId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Trait</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this trait? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteTrait}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Inventory Modals */}
+      <Dialog open={isCreatingInventory} onOpenChange={setIsCreatingInventory}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Inventory Item</DialogTitle>
+          </DialogHeader>
+          <InventoryForm onClose={() => setIsCreatingInventory(false)} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!editingInventory} onOpenChange={(open) => !open && setEditingInventory(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Inventory Item</DialogTitle>
+          </DialogHeader>
+          {editingInventory && (
+            <InventoryForm item={editingInventory} onClose={() => setEditingInventory(null)} />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deletingInventoryId} onOpenChange={(open) => !open && setDeletingInventoryId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Inventory Item</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this item? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteInventory}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
+

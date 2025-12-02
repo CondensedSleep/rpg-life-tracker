@@ -1,6 +1,7 @@
 import type { StateCreator } from 'zustand'
 import type { DailyRoll, HitDice, InspirationTokens, DayState, CoreStatName } from '@/types'
 import { determineDayState } from '@/lib/calculations'
+import { getTodayLocalDate } from '@/lib/dateUtils'
 
 export interface GameStateState {
   // Data
@@ -41,7 +42,7 @@ export const createGameStateSlice: StateCreator<GameStateState> = (set, get) => 
   // Daily roll actions
   recordDailyRoll: (rollValue, affectedStats, _selectedStat) => {
     const dayState = determineDayState(rollValue)
-    const today = new Date().toISOString().split('T')[0]
+    const today = getTodayLocalDate()
 
     // This would normally be persisted to Supabase
     // For now, just update local state

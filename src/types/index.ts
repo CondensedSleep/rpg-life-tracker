@@ -41,8 +41,9 @@ export interface Ability {
   character_id: string
   core_stat: CoreStatName
   ability_name: string
-  initial_value: number
-  current_value: number
+  initial_value: number // Starting value from character creation (never changes)
+  base_value: number // Current base value including permanent changes from level-ups
+  current_value: number // Fully modified value including traits, items, and temporary effects
   times_used_this_level: number
   total_times_used: number
 }

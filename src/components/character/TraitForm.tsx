@@ -15,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
 import { MechanicalEffectBuilder } from './MechanicalEffectBuilder'
 
 interface TraitFormProps {
@@ -36,13 +35,11 @@ export function TraitForm({ trait, characterId, onSuccess, onCancel }: TraitForm
       trait_type: trait.trait_type || 'feature',
       description: trait.description || '',
       mechanical_effect: trait.mechanical_effect || null,
-      is_active: trait.is_active,
     } : {
       trait_name: '',
       trait_type: 'feature',
       description: '',
       mechanical_effect: null,
-      is_active: true,
     },
   })
 
@@ -137,18 +134,6 @@ export function TraitForm({ trait, characterId, onSuccess, onCancel }: TraitForm
 
       {/* Mechanical Effect Builder */}
       <MechanicalEffectBuilder form={form} />
-
-      {/* Is Active */}
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="is-active"
-          checked={form.watch('is_active')}
-          onCheckedChange={(checked) => form.setValue('is_active', checked as boolean)}
-        />
-        <Label htmlFor="is-active" className="cursor-pointer">
-          Trait is active
-        </Label>
-      </div>
 
       {/* Form Actions */}
       <div className="flex gap-3 justify-end pt-4">

@@ -93,7 +93,8 @@ export function recalculateCoreStats(
       stat.base_value,
       statAbilities.map((a) => ({
         initial: a.initial_value,
-        current: a.current_value,
+        // Fallback: if base_value doesn't exist, use current_value
+        current: a.base_value !== undefined ? a.base_value : a.current_value,
       }))
     )
 
@@ -141,7 +142,7 @@ export function calculateExhaustionLevel(
  * Evaluate a condition string (simplified)
  * Examples: "drive > 0", "nutrition > 0", "always"
  */
-function evaluateCondition(
+export function evaluateCondition(
   condition: string,
   abilities: Ability[]
 ): boolean {
@@ -179,6 +180,35 @@ function evaluateCondition(
 }
 
 /**
+ * Evaluate whether a trait should be active based on its conditions
+ * A trait is active if it has no mechanical effects, or if ANY of its effects
+ * have conditions that are met (or have no condition/condition is "always")
+ */
+export function evaluateTraitIsActive(
+  trait: Trait,
+  abilities: Ability[]
+): boolean {
+  // If no mechanical effects, trait is always active
+  if (!trait.mechanical_effect || trait.mechanical_effect.length === 0) {
+    return true
+  }
+
+  // Check if ANY effect's condition is met
+  for (const effect of trait.mechanical_effect) {
+    const condition = effect.condition || 'always'
+    const isConditionMet = evaluateCondition(condition, abilities)
+    console.log(`🔍 Trait "${trait.trait_name}": condition "${condition}" = ${isConditionMet}`)
+    if (isConditionMet) {
+      return true
+    }
+  }
+
+  // No effects have met conditions
+  console.log(`❌ Trait "${trait.trait_name}": NO conditions met, trait is inactive`)
+  return false
+}
+
+/**
  * Calculate total modifier for an ability with all effects applied
  */
 export function calculateTotalModifier(
@@ -212,23 +242,41 @@ export function calculateTotalModifier(
   for (const trait of traits) {
     if (!trait.is_active || !trait.mechanical_effect) continue
 
-    const effect = trait.mechanical_effect
-    const condition = effect.condition || 'always'
+    // Iterate through all effects in the array
+    for (const effect of trait.mechanical_effect) {
+      const condition = effect.condition || 'always'
 
-    if (!evaluateCondition(condition, abilities)) continue
+      if (!evaluateCondition(condition, abilities)) continue
 
-    // Check if this trait affects this ability
-    const affectsAbility =
-      effect.stat === abilityName ||
-      effect.stats?.includes(abilityName) ||
-      (coreStat && (effect.stat === coreStat || effect.stats?.includes(coreStat)))
+      // Handle stat_modifier type with stat_modifiers array
+      if (effect.type === 'stat_modifier' && effect.stat_modifiers) {
+        for (const statMod of effect.stat_modifiers) {
+          if (statMod.stat === abilityName) {
+            total += statMod.modifier
+            breakdown.push({
+              source: `${trait.trait_name} (${trait.trait_type})`,
+              value: statMod.modifier,
+            })
+          }
+        }
+      }
 
-    if (affectsAbility && effect.modifier) {
-      total += effect.modifier
-      breakdown.push({
-        source: `${trait.trait_name} (${trait.trait_type})`,
-        value: effect.modifier,
-      })
+      // Handle advantage/disadvantage
+      if (effect.type === 'advantage' && effect.affected_stats?.includes(abilityName)) {
+        hasAdvantage = true
+        breakdown.push({
+          source: `${trait.trait_name} (advantage)`,
+          value: 0,
+        })
+      }
+
+      if (effect.type === 'disadvantage' && effect.affected_stats?.includes(abilityName)) {
+        hasDisadvantage = true
+        breakdown.push({
+          source: `${trait.trait_name} (disadvantage)`,
+          value: 0,
+        })
+      }
     }
   }
 
@@ -236,24 +284,27 @@ export function calculateTotalModifier(
   for (const item of inventory) {
     if (!item.is_equipped || !item.passive_effect) continue
 
-    const effect = item.passive_effect
-    const condition = effect.condition || 'always'
+    // Iterate through all effects in the array
+    for (const effect of item.passive_effect) {
+      const condition = effect.condition || 'always'
 
-    if (!evaluateCondition(condition, abilities)) continue
+      if (!evaluateCondition(condition, abilities)) continue
 
-    // Check if this item affects this ability
-    const affectsAbility = effect.stat === abilityName || (coreStat && effect.stat === coreStat)
-
-    if (affectsAbility) {
-      if (effect.modifier) {
-        total += effect.modifier
-        breakdown.push({
-          source: `${item.item_name} (${item.item_type})`,
-          value: effect.modifier,
-        })
+      // Handle stat_modifier type with stat_modifiers array
+      if (effect.type === 'stat_modifier' && effect.stat_modifiers) {
+        for (const statMod of effect.stat_modifiers) {
+          if (statMod.stat === abilityName) {
+            total += statMod.modifier
+            breakdown.push({
+              source: `${item.item_name} (${item.item_type})`,
+              value: statMod.modifier,
+            })
+          }
+        }
       }
 
-      if (effect.type === 'advantage') {
+      // Handle advantage/disadvantage
+      if (effect.type === 'advantage' && effect.affected_stats?.includes(abilityName)) {
         hasAdvantage = true
         breakdown.push({
           source: `${item.item_name} (advantage)`,
@@ -261,7 +312,7 @@ export function calculateTotalModifier(
         })
       }
 
-      if (effect.type === 'disadvantage') {
+      if (effect.type === 'disadvantage' && effect.affected_stats?.includes(abilityName)) {
         hasDisadvantage = true
         breakdown.push({
           source: `${item.item_name} (disadvantage)`,
