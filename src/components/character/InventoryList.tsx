@@ -77,7 +77,7 @@ export function InventoryList() {
 
       {/* Inventory List */}
       {inventory.length === 0 ? (
-        <div className="p-6 bg-bg-secondary rounded-lg border border-border text-center">
+        <div className="p-6 bg-bg-secondary rounded-lg border border-border text-center frosted">
           <p className="text-text-secondary">
             No items yet. Add your first item to track your gear and equipment.
           </p>
@@ -87,7 +87,7 @@ export function InventoryList() {
           {inventory.map((item) => (
             <div
               key={item.id}
-              className="p-4 bg-bg-secondary rounded-lg border border-border"
+              className="p-4 bg-bg-secondary rounded-lg border border-border frosted hover:bg-bg-tertiary transition-colors"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 space-y-2">

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Quest } from '@/types'
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -15,6 +17,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+
+// All available abilities
+const ABILITIES = [
+  'nutrition', 'strength', 'agility', 'sex',
+  'language', 'literature', 'research', 'openness',
+  'empathy', 'love', 'expression', 'drive',
+  'mindfulness', 'nature', 'creation', 'honesty',
+]
 
 interface QuestFormProps {
   quest?: Quest
@@ -26,6 +36,10 @@ interface QuestFormProps {
 export function QuestForm({ quest, characterId, onSuccess, onCancel }: QuestFormProps) {
   const addQuest = useStore((state) => state.addQuest)
   const updateQuestInStore = useStore((state) => state.updateQuest)
+
+  const [hasProgressionMilestone, setHasProgressionMilestone] = useState(
+    !!quest?.progression_milestone
+  )
 
   const form = useForm<QuestFormValues>({
     resolver: zodResolver(questFormSchema),
@@ -187,6 +201,84 @@ export function QuestForm({ quest, characterId, onSuccess, onCancel }: QuestForm
           rows={3}
         />
       </div>
+
+      {/* Progression Milestone (Weekly quests only) */}
+      {form.watch('quest_type') === 'weekly' && (
+        <div className="space-y-4 p-4 border border-border rounded-lg bg-bg-tertiary frosted-sm">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="has-milestone"
+              checked={hasProgressionMilestone}
+              onCheckedChange={(checked) => {
+                setHasProgressionMilestone(checked as boolean)
+                if (!checked) {
+                  form.setValue('progression_milestone', undefined)
+                }
+              }}
+            />
+            <Label htmlFor="has-milestone" className="cursor-pointer">
+              Add Progression Milestone
+            </Label>
+          </div>
+          <p className="text-xs text-text-secondary">
+            Reward ability points after completing this quest multiple times (e.g., +1 creation every 5 completions)
+          </p>
+
+          {hasProgressionMilestone && (
+            <div className="space-y-4 pt-2">
+              {/* Ability */}
+              <div>
+                <Label htmlFor="milestone-ability">Ability to Increase</Label>
+                <Select
+                  value={form.watch('progression_milestone.ability') || ''}
+                  onValueChange={(value) => form.setValue('progression_milestone.ability', value)}
+                >
+                  <SelectTrigger id="milestone-ability">
+                    <SelectValue placeholder="Select ability" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ABILITIES.map((ability) => (
+                      <SelectItem key={ability} value={ability}>
+                        {ability}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Every X completions */}
+              <div>
+                <Label htmlFor="milestone-every">Every X Completions</Label>
+                <Input
+                  id="milestone-every"
+                  type="number"
+                  min="1"
+                  {...form.register('progression_milestone.every', { valueAsNumber: true })}
+                  placeholder="e.g., 5"
+                />
+                <p className="text-xs text-text-secondary mt-1">
+                  How many times to complete before gaining ability points
+                </p>
+              </div>
+
+              {/* Gain Y points */}
+              <div>
+                <Label htmlFor="milestone-gain">Gain Y Points</Label>
+                <Input
+                  id="milestone-gain"
+                  type="number"
+                  min="1"
+                  {...form.register('progression_milestone.gain', { valueAsNumber: true })}
+                  placeholder="e.g., 1"
+                />
+                <p className="text-xs text-text-secondary mt-1">
+                  How many points to add to the ability
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Form Actions */}
       <div className="flex gap-3 justify-end pt-4">

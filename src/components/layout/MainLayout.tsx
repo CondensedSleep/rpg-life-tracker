@@ -25,7 +25,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-bg-secondary border-t border-border">
+      <nav className="fixed bottom-0 left-0 right-0 bg-bg-secondary border-t border-border frosted">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-4 gap-1">
             {navItems.map((item) => {
@@ -36,11 +36,11 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                   to={item.to}
                   className={`
                     flex flex-col items-center justify-center py-3 px-2
-                    transition-colors duration-200
+                    transition-all duration-200 rounded-lg
                     ${
                       isActive
-                        ? 'text-accent-primary'
-                        : 'text-text-secondary hover:text-text-primary'
+                        ? 'text-accent-primary bg-accent-primary/10'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary'
                     }
                   `}
                 >

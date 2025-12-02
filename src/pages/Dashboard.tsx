@@ -23,7 +23,7 @@ export function Dashboard() {
       </div>
 
       {/* XP Progress */}
-      <div className="mb-8 p-4 bg-bg-secondary rounded-lg border border-border">
+      <div className="mb-8 p-4 bg-bg-secondary rounded-lg border border-border frosted">
         <div className="flex justify-between mb-2">
           <span>XP: {character.current_xp} / {character.xp_to_next_level}</span>
           <span>Next Level: {character.level + 1}</span>
@@ -41,7 +41,7 @@ export function Dashboard() {
       {/* Core Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {Object.entries(coreStats).map(([statName, stat]) => (
-          <div key={statName} className="p-4 bg-bg-secondary rounded-lg border border-border">
+          <div key={statName} className="p-4 bg-bg-secondary rounded-lg border border-border frosted">
             <h3 className="text-xl font-bold uppercase mb-2">{statName}</h3>
             <div className="text-3xl font-bold text-accent-secondary mb-4">
               {stat.current_value}

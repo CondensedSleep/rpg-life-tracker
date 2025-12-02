@@ -2,8 +2,8 @@
 
 :root {
   --bg-primary: #1a1a1a;
-  --bg-secondary: #242424;
-  --bg-tertiary: #2d2d2d;
+  --bg-secondary: rgba(36, 36, 36, 0.8);
+  --bg-tertiary: rgba(45, 45, 45, 0.7);
   --text-primary: #e5e5e5;
   --text-secondary: #a0a0a0;
   --accent-primary: #dc2626;
@@ -11,6 +11,22 @@
   --accent-success: #10b981;
   --accent-warning: #f59e0b;
   --border: #404040;
+}
+
+/* Frosted glass effect utility classes */
+.frosted {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.frosted-sm {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.frosted-lg {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 body {
