@@ -277,6 +277,38 @@ export async function loadDataFromSupabase(userId: string) {
 
     if (hitDice) {
       store.setHitDice(hitDice)
+    } else {
+      // Hit dice doesn't exist, create it
+      console.log('⚠️ Hit dice not found, creating...')
+
+      // Get body stat value to calculate max hit dice
+      const { data: coreStats } = await supabase
+        .from('core_stats')
+        .select('*')
+        .eq('character_id', character.id)
+        .eq('stat_name', 'body')
+        .single()
+
+      const bodyValue = coreStats?.current_value || 10
+      const maxHD = Math.ceil(bodyValue / 2.5)
+
+      const { data: newHitDice } = await supabase
+        .from('hit_dice')
+        .insert([{
+          character_id: character.id,
+          max_hit_dice: maxHD,
+          current_hit_dice: maxHD,
+          exhaustion_level: 0,
+          days_at_zero: 0,
+          last_long_rest: null,
+        }])
+        .select()
+        .single()
+
+      if (newHitDice) {
+        store.setHitDice(newHitDice)
+        console.log('✅ Hit dice created:', newHitDice)
+      }
     }
 
     // Load inspiration tokens
