@@ -103,3 +103,42 @@ export const questFormSchema = z.object({
 })
 
 export type QuestFormValues = z.infer<typeof questFormSchema>
+
+// ============================================================================
+// ACTION LOG VALIDATION SCHEMAS
+// ============================================================================
+
+export const abilityCheckSchema = z.object({
+  ability_name: z.string().optional().nullable(),
+  roll_value: z.number().min(1).max(20, 'Roll must be between 1 and 20'),
+  dc: z.number().min(1).max(30).optional().nullable(),
+  description: z.string().optional().nullable(),
+  xp_gained: z.number().min(0).optional().nullable(),
+  tagged_items: z.array(z.string()).optional().nullable(), // Array of item IDs
+})
+
+export type AbilityCheckFormValues = z.infer<typeof abilityCheckSchema>
+
+export const savingThrowSchema = z.object({
+  ability_name: z.string().optional().nullable(),
+  roll_value: z.number().min(1).max(20, 'Roll must be between 1 and 20'),
+  dc: z.number().min(1).max(30).optional().nullable(),
+  description: z.string().optional().nullable(),
+  xp_gained: z.number().min(0).optional().nullable(),
+  tagged_items: z.array(z.string()).optional().nullable(), // Array of item IDs
+})
+
+export type SavingThrowFormValues = z.infer<typeof savingThrowSchema>
+
+export const customEffectFormSchema = z.object({
+  effect_name: z.string().min(1, 'Effect name is required').max(100),
+  effect_type: z.enum(['stat_modifier', 'advantage', 'disadvantage', 'custom'], {
+    required_error: 'Effect type is required',
+  }),
+  affected_stats: z.array(z.string()).optional().nullable(),
+  stat_modifiers: z.array(statModifierSchema).optional().nullable(),
+  modifier: z.number().optional().nullable(),
+  description: z.string().optional().nullable(),
+})
+
+export type CustomEffectFormValues = z.infer<typeof customEffectFormSchema>

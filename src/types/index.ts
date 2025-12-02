@@ -159,6 +159,19 @@ export interface HitDice {
   updated_at: string
 }
 
+export interface CustomEffect {
+  id: string
+  character_id: string
+  effect_name: string
+  effect_type: 'stat_modifier' | 'advantage' | 'disadvantage' | 'custom'
+  affected_stats?: string[] | null
+  stat_modifiers?: StatModifier[] | null
+  modifier?: number | null
+  description?: string | null
+  created_at: string
+  expires_at: string
+}
+
 // ============================================================================
 // Journal & Actions
 // ============================================================================
