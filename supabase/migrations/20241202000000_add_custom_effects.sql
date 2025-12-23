@@ -2,7 +2,7 @@
 -- Add custom_effects table for temporary daily buffs/debuffs
 -- ============================================================================
 
-CREATE TABLE custom_effects (
+CREATE TABLE IF NOT EXISTS custom_effects (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   character_id UUID NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
   effect_name TEXT NOT NULL,
@@ -15,13 +15,17 @@ CREATE TABLE custom_effects (
   expires_at TIMESTAMPTZ NOT NULL
 );
 
--- Indexes
-CREATE INDEX idx_custom_effects_character_id ON custom_effects(character_id);
-CREATE INDEX idx_custom_effects_expires_at ON custom_effects(expires_at);
-CREATE INDEX idx_custom_effects_character_active ON custom_effects(character_id, expires_at);
+-- Indexes (use IF NOT EXISTS for safety)
+CREATE INDEX IF NOT EXISTS idx_custom_effects_character_id ON custom_effects(character_id);
+CREATE INDEX IF NOT EXISTS idx_custom_effects_expires_at ON custom_effects(expires_at);
+CREATE INDEX IF NOT EXISTS idx_custom_effects_character_active ON custom_effects(character_id, expires_at);
 
 -- RLS Policies
 ALTER TABLE custom_effects ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist before recreating
+DROP POLICY IF EXISTS "Users can view their character's custom effects" ON custom_effects;
+DROP POLICY IF EXISTS "Users can manage their character's custom effects" ON custom_effects;
 
 CREATE POLICY "Users can view their character's custom effects"
   ON custom_effects FOR SELECT
@@ -38,6 +42,3 @@ CREATE POLICY "Users can manage their character's custom effects"
     WHERE characters.id = custom_effects.character_id
     AND characters.user_id = auth.uid()
   ));
-
--- Trigger for updated_at (if we add it later)
--- Currently not needed as effects are immutable once created

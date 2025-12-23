@@ -11,6 +11,7 @@ export const statModifierSchema = z.object({
 
 export const mechanicalEffectItemSchema = z.object({
   type: z.enum(['stat_modifier', 'advantage', 'disadvantage', 'custom']).optional(),
+  applies_to: z.array(z.enum(['ability_checks', 'saving_throws', 'passive_modifier'])).optional(),  // When this effect applies
   affected_stats: z.array(z.string()).optional(),  // For advantage/disadvantage
   stat_modifiers: z.array(statModifierSchema).optional(),  // For stat_modifier with individual modifiers
   modifier: z.number().optional(),  // Flat modifier for advantage/disadvantage
@@ -28,6 +29,7 @@ export type MechanicalEffectFormValues = z.infer<typeof mechanicalEffectItemSche
 
 export const passiveEffectItemSchema = z.object({
   type: z.enum(['stat_modifier', 'advantage', 'disadvantage', 'custom']).optional(),
+  applies_to: z.array(z.enum(['ability_checks', 'saving_throws', 'passive_modifier'])).optional(),  // When this effect applies
   affected_stats: z.array(z.string()).optional(),  // For advantage/disadvantage
   stat_modifiers: z.array(statModifierSchema).optional(),  // For stat_modifier with individual modifiers
   modifier: z.number().optional(),  // Flat modifier for advantage/disadvantage
@@ -112,6 +114,9 @@ export const abilityCheckSchema = z.object({
   ability_name: z.string().optional().nullable(),
   roll_value: z.number().min(1).max(20, 'Roll must be between 1 and 20'),
   dc: z.number().min(1).max(30).optional().nullable(),
+  had_advantage: z.boolean().optional().nullable(),
+  had_disadvantage: z.boolean().optional().nullable(),
+  additional_modifier: z.number().optional().nullable(),
   description: z.string().optional().nullable(),
   xp_gained: z.number().min(0).optional().nullable(),
   tagged_items: z.array(z.string()).optional().nullable(), // Array of item IDs
@@ -123,6 +128,9 @@ export const savingThrowSchema = z.object({
   ability_name: z.string().optional().nullable(),
   roll_value: z.number().min(1).max(20, 'Roll must be between 1 and 20'),
   dc: z.number().min(1).max(30).optional().nullable(),
+  had_advantage: z.boolean().optional().nullable(),
+  had_disadvantage: z.boolean().optional().nullable(),
+  additional_modifier: z.number().optional().nullable(),
   description: z.string().optional().nullable(),
   xp_gained: z.number().min(0).optional().nullable(),
   tagged_items: z.array(z.string()).optional().nullable(), // Array of item IDs

@@ -3,6 +3,7 @@ import type { InventoryFormValues } from '@/lib/validations'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -59,6 +60,7 @@ export function PassiveEffectBuilder({ form }: PassiveEffectBuilderProps) {
             const effectType = form.watch(`passive_effect.${index}.type`)
             const affectedStats = form.watch(`passive_effect.${index}.affected_stats`) || []
             const statModifiers = form.watch(`passive_effect.${index}.stat_modifiers`) || []
+            const appliesTo = form.watch(`passive_effect.${index}.applies_to`) || []
 
             return (
               <div
@@ -101,6 +103,78 @@ export function PassiveEffectBuilder({ form }: PassiveEffectBuilderProps) {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Applies To - Show for stat_modifier, advantage, and disadvantage */}
+                {(effectType === 'stat_modifier' || effectType === 'advantage' || effectType === 'disadvantage') && (
+                  <div className="space-y-2">
+                    <Label>Applies To (Optional - defaults to all)</Label>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`passive-applies-ability-checks-${index}`}
+                          checked={appliesTo.includes('ability_checks')}
+                          onCheckedChange={(checked) => {
+                            const current = appliesTo || []
+                            if (checked) {
+                              form.setValue(`passive_effect.${index}.applies_to`, [...current, 'ability_checks'])
+                            } else {
+                              form.setValue(`passive_effect.${index}.applies_to`, current.filter((v: string) => v !== 'ability_checks'))
+                            }
+                          }}
+                        />
+                        <label
+                          htmlFor={`passive-applies-ability-checks-${index}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Ability Checks
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`passive-applies-saving-throws-${index}`}
+                          checked={appliesTo.includes('saving_throws')}
+                          onCheckedChange={(checked) => {
+                            const current = appliesTo || []
+                            if (checked) {
+                              form.setValue(`passive_effect.${index}.applies_to`, [...current, 'saving_throws'])
+                            } else {
+                              form.setValue(`passive_effect.${index}.applies_to`, current.filter((v: string) => v !== 'saving_throws'))
+                            }
+                          }}
+                        />
+                        <label
+                          htmlFor={`passive-applies-saving-throws-${index}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Saving Throws
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`passive-applies-passive-modifier-${index}`}
+                          checked={appliesTo.includes('passive_modifier')}
+                          onCheckedChange={(checked) => {
+                            const current = appliesTo || []
+                            if (checked) {
+                              form.setValue(`passive_effect.${index}.applies_to`, [...current, 'passive_modifier'])
+                            } else {
+                              form.setValue(`passive_effect.${index}.applies_to`, current.filter((v: string) => v !== 'passive_modifier'))
+                            }
+                          }}
+                        />
+                        <label
+                          htmlFor={`passive-applies-passive-modifier-${index}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Passive Ability Modifier
+                        </label>
+                      </div>
+                    </div>
+                    <p className="text-xs text-text-secondary">
+                      If no options selected, effect applies to all roll types
+                    </p>
+                  </div>
+                )}
 
                 {/* STAT MODIFIER TYPE */}
                 {effectType === 'stat_modifier' && (
@@ -242,7 +316,7 @@ export function PassiveEffectBuilder({ form }: PassiveEffectBuilderProps) {
                         type="number"
                         placeholder="e.g., +2 or -1"
                         {...form.register(`passive_effect.${index}.modifier`, {
-                          valueAsNumber: true,
+                          setValueAs: (v) => v === '' || v === null ? undefined : Number(v),
                         })}
                       />
                       <p className="text-xs text-text-secondary mt-1">

@@ -12,6 +12,9 @@ export async function logAbilityCheck(params: {
   abilityName?: string | null
   rollValue: number
   dc?: number | null
+  hadAdvantage?: boolean | null
+  hadDisadvantage?: boolean | null
+  additionalModifier?: number | null
   description?: string | null
   xpGained?: number | null
   taggedItems?: string[] | null
@@ -21,6 +24,9 @@ export async function logAbilityCheck(params: {
     abilityName,
     rollValue,
     dc,
+    hadAdvantage: manualAdvantage,
+    hadDisadvantage: manualDisadvantage,
+    additionalModifier,
     description,
     xpGained,
     taggedItems,
@@ -81,8 +87,23 @@ export async function logAbilityCheck(params: {
       )
     : { total: 0, hasAdvantage: false, hasDisadvantage: false }
 
-  const modifier = modifierCalc.total
+  // Include additional modifier from form
+  const baseModifier = modifierCalc.total
+  const modifier = baseModifier + (additionalModifier || 0)
   const totalResult = rollValue + modifier
+
+  // Build modifier breakdown for display
+  const modifierBreakdown: Array<{ label: string; value: number }> = []
+  if (abilityName || baseModifier !== 0) {
+    modifierBreakdown.push({ label: abilityName || 'Base', value: baseModifier })
+  }
+  if (additionalModifier !== null && additionalModifier !== undefined) {
+    modifierBreakdown.push({ label: 'Additional Modifier', value: additionalModifier })
+  }
+
+  // Merge calculated advantage/disadvantage with manual overrides
+  const hasAdvantage = manualAdvantage || modifierCalc.hasAdvantage
+  const hasDisadvantage = manualDisadvantage || modifierCalc.hasDisadvantage
 
   // Determine outcome
   let outcome: 'success' | 'failed' | 'critical_success' | 'critical_failure' | null = null
@@ -119,10 +140,11 @@ export async function logAbilityCheck(params: {
       ability_used: abilityName,
       roll_value: rollValue,
       modifier_value: modifier,
+      modifier_breakdown: modifierBreakdown.length > 0 ? modifierBreakdown : null,
       total_value: totalResult,
       difficulty_class: dc,
-      had_advantage: modifierCalc.hasAdvantage,
-      had_disadvantage: modifierCalc.hasDisadvantage,
+      had_advantage: hasAdvantage,
+      had_disadvantage: hasDisadvantage,
       success: outcome === 'success' || outcome === 'critical_success',
       xp_awarded: finalXP > 0 ? finalXP : null,
       notes: description,
@@ -180,6 +202,9 @@ export async function logSavingThrow(params: {
   abilityName?: string | null
   rollValue: number
   dc?: number | null
+  hadAdvantage?: boolean | null
+  hadDisadvantage?: boolean | null
+  additionalModifier?: number | null
   description?: string | null
   xpGained?: number | null
   taggedItems?: string[] | null
@@ -189,6 +214,9 @@ export async function logSavingThrow(params: {
     abilityName,
     rollValue,
     dc,
+    hadAdvantage: manualAdvantage,
+    hadDisadvantage: manualDisadvantage,
+    additionalModifier,
     description,
     xpGained,
     taggedItems,
@@ -247,8 +275,23 @@ export async function logSavingThrow(params: {
       )
     : { total: 0, hasAdvantage: false, hasDisadvantage: false }
 
-  const modifier = modifierCalc.total
+  // Include additional modifier from form
+  const baseModifier = modifierCalc.total
+  const modifier = baseModifier + (additionalModifier || 0)
   const totalResult = rollValue + modifier
+
+  // Build modifier breakdown for display
+  const modifierBreakdown: Array<{ label: string; value: number }> = []
+  if (abilityName || baseModifier !== 0) {
+    modifierBreakdown.push({ label: abilityName || 'Base', value: baseModifier })
+  }
+  if (additionalModifier !== null && additionalModifier !== undefined) {
+    modifierBreakdown.push({ label: 'Additional Modifier', value: additionalModifier })
+  }
+
+  // Merge calculated advantage/disadvantage with manual overrides
+  const hasAdvantage = manualAdvantage || modifierCalc.hasAdvantage
+  const hasDisadvantage = manualDisadvantage || modifierCalc.hasDisadvantage
 
   // Determine outcome
   let outcome: 'success' | 'failed' | 'critical_success' | 'critical_failure' | null = null
@@ -284,10 +327,11 @@ export async function logSavingThrow(params: {
       ability_used: abilityName,
       roll_value: rollValue,
       modifier_value: modifier,
+      modifier_breakdown: modifierBreakdown.length > 0 ? modifierBreakdown : null,
       total_value: totalResult,
       difficulty_class: dc,
-      had_advantage: modifierCalc.hasAdvantage,
-      had_disadvantage: modifierCalc.hasDisadvantage,
+      had_advantage: hasAdvantage,
+      had_disadvantage: hasDisadvantage,
       success: outcome === 'success' || outcome === 'critical_success',
       xp_awarded: finalXP > 0 ? finalXP : null,
       notes: description,

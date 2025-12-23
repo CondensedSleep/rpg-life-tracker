@@ -26,6 +26,30 @@ import { recalculateAbilityValues } from '@/lib/abilityService'
 import { getTodayLocalDate } from '@/lib/dateUtils'
 import { loadDataFromSupabase } from '@/lib/loadSeedData'
 
+// Helper function to format applies_to field for display
+function formatAppliesTo(appliesTo?: string[]): string {
+  if (!appliesTo || appliesTo.length === 0) {
+    return '' // Empty string when applies to all
+  }
+  
+  const formatted = appliesTo.map(type => {
+    switch(type) {
+      case 'ability_checks': return 'Ability Checks'
+      case 'saving_throws': return 'Saving Throws'
+      case 'passive_modifier': return 'Passive Ability Modifier'
+      default: return type
+    }
+  })
+  
+  if (formatted.length === 1) {
+    return formatted[0]
+  } else if (formatted.length === 2) {
+    return formatted.join(' & ')
+  } else {
+    return formatted.slice(0, -1).join(', ') + ', & ' + formatted[formatted.length - 1]
+  }
+}
+
 export function Dashboard() {
   const character = useCharacter()
   const coreStats = useCoreStats()
@@ -516,10 +540,24 @@ export function Dashboard() {
                                   </span>
                                 )}
                                 {effect.type === 'advantage' && (
-                                  <span>Advantage on <span className="uppercase">{effect.affected_stats?.join(', ')}</span></span>
+                                  <span>
+                                    Advantage on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
+                                      ? effect.affected_stats.slice(0, -1).join(', ') + ', & ' + effect.affected_stats[effect.affected_stats.length - 1]
+                                      : effect.affected_stats?.join(', ')}</span>
+                                    {effect.applies_to && effect.applies_to.length > 0 && (
+                                      <span> {formatAppliesTo(effect.applies_to)}</span>
+                                    )}
+                                  </span>
                                 )}
                                 {effect.type === 'disadvantage' && (
-                                  <span>Disadvantage on <span className="uppercase">{effect.affected_stats?.join(', ')}</span></span>
+                                  <span>
+                                    Disadvantage on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
+                                      ? effect.affected_stats.slice(0, -1).join(', ') + ', & ' + effect.affected_stats[effect.affected_stats.length - 1]
+                                      : effect.affected_stats?.join(', ')}</span>
+                                    {effect.applies_to && effect.applies_to.length > 0 && (
+                                      <span> {formatAppliesTo(effect.applies_to)}</span>
+                                    )}
+                                  </span>
                                 )}
                                 {effect.condition && (
                                   <span className="text-text-secondary italic"> ({effect.condition})</span>
@@ -573,14 +611,17 @@ export function Dashboard() {
                   <div key={item.id} className="text-sm group hover:bg-bg-tertiary/50 p-2 -mx-2 rounded transition-colors">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">{item.item_name}</span>
-                          <span className="text-xs text-text-secondary capitalize">({item.item_type})</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold">
+                            {item.item_name}
+                            {(item.item_type || item.condition) && (
+                              <span className="text-xs font-normal text-text-secondary ml-2">
+                                ({[item.item_type && item.item_type.charAt(0).toUpperCase() + item.item_type.slice(1), item.condition].filter(Boolean).join(', ')})
+                              </span>
+                            )}
+                          </span>
                         </div>
                         {item.description && (
-                          <p className="text-xs text-text-secondary mt-0.5">{item.description}</p>
-                        )}
-                                                {item.description && (
                           <p className="text-xs text-text-secondary mt-0.5">{item.description}</p>
                         )}
                         {item.passive_effect && item.passive_effect.length > 0 && (
@@ -598,10 +639,24 @@ export function Dashboard() {
                                   </span>
                                 )}
                                 {effect.type === 'advantage' && (
-                                  <span>Advantage on <span className="uppercase">{effect.affected_stats?.join(', ')}</span></span>
+                                  <span>
+                                    Advantage on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
+                                      ? effect.affected_stats.slice(0, -1).join(', ') + ', & ' + effect.affected_stats[effect.affected_stats.length - 1]
+                                      : effect.affected_stats?.join(', ')}</span>
+                                    {effect.applies_to && effect.applies_to.length > 0 && (
+                                      <span> {formatAppliesTo(effect.applies_to)}</span>
+                                    )}
+                                  </span>
                                 )}
                                 {effect.type === 'disadvantage' && (
-                                  <span>Disadvantage on <span className="uppercase">{effect.affected_stats?.join(', ')}</span></span>
+                                  <span>
+                                    Disadvantage on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
+                                      ? effect.affected_stats.slice(0, -1).join(', ') + ', & ' + effect.affected_stats[effect.affected_stats.length - 1]
+                                      : effect.affected_stats?.join(', ')}</span>
+                                    {effect.applies_to && effect.applies_to.length > 0 && (
+                                      <span> {formatAppliesTo(effect.applies_to)}</span>
+                                    )}
+                                  </span>
                                 )}
                                 {effect.condition && (
                                   <span className="text-text-secondary italic"> ({effect.condition})</span>
@@ -609,9 +664,6 @@ export function Dashboard() {
                               </div>
                             ))}
                           </div>
-                        )}
-                        {item.condition && (
-                          <p className="text-xs text-text-secondary italic mt-1">Active: {item.condition}</p>
                         )}
                       </div>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -655,7 +707,13 @@ export function Dashboard() {
           <DialogHeader>
             <DialogTitle>Create Trait</DialogTitle>
           </DialogHeader>
-          <TraitForm onClose={() => setIsCreatingTrait(false)} />
+          {character && (
+            <TraitForm
+              characterId={character.id}
+              onSuccess={() => setIsCreatingTrait(false)}
+              onCancel={() => setIsCreatingTrait(false)}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
@@ -664,8 +722,13 @@ export function Dashboard() {
           <DialogHeader>
             <DialogTitle>Edit Trait</DialogTitle>
           </DialogHeader>
-          {editingTrait && (
-            <TraitForm trait={editingTrait} onClose={() => setEditingTrait(null)} />
+          {editingTrait && character && (
+            <TraitForm
+              trait={editingTrait}
+              characterId={character.id}
+              onSuccess={() => setEditingTrait(null)}
+              onCancel={() => setEditingTrait(null)}
+            />
           )}
         </DialogContent>
       </Dialog>
@@ -691,7 +754,13 @@ export function Dashboard() {
           <DialogHeader>
             <DialogTitle>Create Inventory Item</DialogTitle>
           </DialogHeader>
-          <InventoryForm onClose={() => setIsCreatingInventory(false)} />
+          {character && (
+            <InventoryForm
+              characterId={character.id}
+              onSuccess={() => setIsCreatingInventory(false)}
+              onCancel={() => setIsCreatingInventory(false)}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
@@ -700,8 +769,13 @@ export function Dashboard() {
           <DialogHeader>
             <DialogTitle>Edit Inventory Item</DialogTitle>
           </DialogHeader>
-          {editingInventory && (
-            <InventoryForm item={editingInventory} onClose={() => setEditingInventory(null)} />
+          {editingInventory && character && (
+            <InventoryForm
+              item={editingInventory}
+              characterId={character.id}
+              onSuccess={() => setEditingInventory(null)}
+              onCancel={() => setEditingInventory(null)}
+            />
           )}
         </DialogContent>
       </Dialog>

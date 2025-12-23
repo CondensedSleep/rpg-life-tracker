@@ -36,6 +36,9 @@ export function QuickLogForm() {
       ability_name: null,
       roll_value: undefined,
       dc: null,
+      had_advantage: false,
+      had_disadvantage: false,
+      additional_modifier: null,
       description: null,
       xp_gained: null,
       tagged_items: [],
@@ -49,6 +52,9 @@ export function QuickLogForm() {
       ability_name: null,
       roll_value: undefined,
       dc: null,
+      had_advantage: false,
+      had_disadvantage: false,
+      additional_modifier: null,
       description: null,
       xp_gained: null,
       tagged_items: [],
@@ -78,6 +84,9 @@ export function QuickLogForm() {
         abilityName: data.ability_name,
         rollValue: data.roll_value,
         dc: data.dc,
+        hadAdvantage: data.had_advantage,
+        hadDisadvantage: data.had_disadvantage,
+        additionalModifier: data.additional_modifier,
         description: data.description,
         xpGained: data.xp_gained,
         taggedItems: data.tagged_items,
@@ -125,6 +134,9 @@ export function QuickLogForm() {
         abilityName: data.ability_name,
         rollValue: data.roll_value,
         dc: data.dc,
+        hadAdvantage: data.had_advantage,
+        hadDisadvantage: data.had_disadvantage,
+        additionalModifier: data.additional_modifier,
         description: data.description,
         xpGained: data.xp_gained,
         taggedItems: data.tagged_items,
@@ -293,6 +305,49 @@ export function QuickLogForm() {
             </div>
           </div>
 
+          {/* Advantage/Disadvantage */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Advantage/Disadvantage (Optional)
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...abilityCheckForm.register('had_advantage')}
+                  className="w-4 h-4 rounded border-border bg-bg-tertiary text-accent-primary focus:ring-accent-primary"
+                />
+                <span className="text-sm text-green-400">Advantage</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...abilityCheckForm.register('had_disadvantage')}
+                  className="w-4 h-4 rounded border-border bg-bg-tertiary text-accent-primary focus:ring-accent-primary"
+                />
+                <span className="text-sm text-red-400">Disadvantage</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Additional Modifier */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Additional Modifier (Optional)
+            </label>
+            <input
+              type="number"
+              placeholder="+2, -1, etc."
+              {...abilityCheckForm.register('additional_modifier', {
+                valueAsNumber: true,
+              })}
+              className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-md"
+            />
+            <p className="text-xs text-text-secondary mt-1">
+              Extra bonus/penalty beyond ability modifiers
+            </p>
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">
               XP Reward (Optional)
@@ -384,6 +439,49 @@ export function QuickLogForm() {
                 className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-md"
               />
             </div>
+          </div>
+
+          {/* Advantage/Disadvantage */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Advantage/Disadvantage (Optional)
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...savingThrowForm.register('had_advantage')}
+                  className="w-4 h-4 rounded border-border bg-bg-tertiary text-accent-primary focus:ring-accent-primary"
+                />
+                <span className="text-sm text-green-400">Advantage</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...savingThrowForm.register('had_disadvantage')}
+                  className="w-4 h-4 rounded border-border bg-bg-tertiary text-accent-primary focus:ring-accent-primary"
+                />
+                <span className="text-sm text-red-400">Disadvantage</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Additional Modifier */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Additional Modifier (Optional)
+            </label>
+            <input
+              type="number"
+              placeholder="+2, -1, etc."
+              {...savingThrowForm.register('additional_modifier', {
+                valueAsNumber: true,
+              })}
+              className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-md"
+            />
+            <p className="text-xs text-text-secondary mt-1">
+              Extra bonus/penalty beyond ability modifiers
+            </p>
           </div>
 
           <div>

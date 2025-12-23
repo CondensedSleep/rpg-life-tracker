@@ -343,31 +343,69 @@ export function Journal() {
                 className="p-3 bg-bg-tertiary rounded border border-border"
               >
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <span className="text-sm font-semibold capitalize">
-                    {action.action_type.replace(/_/g, ' ')}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {action.ability_used && (
+                      <span className="text-xs text-accent-secondary uppercase font-semibold">
+                        {action.ability_used}
+                      </span>
+                    )}
+                    <span className="text-sm font-semibold capitalize">
+                      ({action.action_type.replace(/_/g, ' ')})
+                    </span>
+                    {action.success !== null && (
+                      <span className={`text-xs ${action.success ? 'text-accent-success' : 'text-accent-primary'}`}>
+                        {action.success ? '✓' : '✗'}
+                      </span>
+                    )}
+                  </div>
                   <span className="text-xs text-text-secondary">
-                    {new Date(action.timestamp).toLocaleTimeString()}
+                    {action.action_time ? new Date(action.action_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                   </span>
                 </div>
                 
-                {action.action_data && (
-                  <div className="text-sm text-text-secondary">
-                    {typeof action.action_data === 'object' && (
-                      <div className="space-y-1">
-                        {Object.entries(action.action_data).map(([key, value]) => (
-                          <div key={key} className="flex gap-2">
-                            <span className="capitalize font-medium">{key}:</span>
-                            <span>{String(value)}</span>
-                          </div>
+                {/* Roll details */}
+                {action.roll_value !== null && (
+                  <div className="text-sm text-text-secondary mt-1">
+                    <span>Roll: {action.roll_value}</span>
+                    {action.modifier_breakdown && action.modifier_breakdown.length > 0 ? (
+                      <>
+                        {action.modifier_breakdown.map((mod, idx) => (
+                          <span key={idx}> ({mod.value >= 0 ? '+' : ''}{mod.value})</span>
                         ))}
-                      </div>
+                      </>
+                    ) : action.modifier_value !== null && (
+                      <span> {action.modifier_value >= 0 ? '+' : ''}{action.modifier_value}</span>
+                    )}
+                    {action.total_value !== null && (
+                      <span> = <strong>{action.total_value}</strong></span>
+                    )}
+                    {action.difficulty_class !== null && (
+                      <span className="ml-2">vs DC {action.difficulty_class}</span>
+                    )}
+                    {action.had_advantage && <span className="ml-2 text-accent-success text-xs">ADV</span>}
+                    {action.had_disadvantage && <span className="ml-2 text-accent-primary text-xs">DIS</span>}
+                  </div>
+                )}
+
+                {/* XP awarded */}
+                {action.xp_awarded !== null && action.xp_awarded > 0 && (
+                  <div className="text-xs text-accent-warning mt-1">
+                    +{action.xp_awarded} XP
+                  </div>
+                )}
+
+                {/* Quest completion */}
+                {action.quest_name && (
+                  <div className="text-sm text-text-secondary mt-1">
+                    Quest: {action.quest_name}
+                    {action.completion_status && (
+                      <span className="ml-1 capitalize">({action.completion_status})</span>
                     )}
                   </div>
                 )}
 
                 {action.notes && (
-                  <p className="text-sm mt-2 italic">{action.notes}</p>
+                  <p className="text-sm mt-2 italic text-text-secondary">{action.notes}</p>
                 )}
               </div>
             ))}

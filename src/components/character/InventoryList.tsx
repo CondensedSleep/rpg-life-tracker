@@ -91,9 +91,15 @@ export function InventoryList() {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold">{item.item_name}</h3>
-                    {getItemTypeBadge(item.item_type)}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-lg font-bold">
+                      {item.item_name}
+                      {(item.item_type || item.condition) && (
+                        <span className="text-base font-normal text-text-secondary ml-2">
+                          ({[item.item_type && item.item_type.charAt(0).toUpperCase() + item.item_type.slice(1), item.condition].filter(Boolean).join(', ')})
+                        </span>
+                      )}
+                    </h3>
                     {item.is_equipped && (
                       <Badge variant="outline" className="text-accent-success flex items-center gap-1">
                         <Check className="w-3 h-3" />
@@ -103,11 +109,6 @@ export function InventoryList() {
                   </div>
                   {item.description && (
                     <p className="text-text-secondary">{item.description}</p>
-                  )}
-                  {item.condition && (
-                    <p className="text-sm text-text-secondary">
-                      Condition: <span className="capitalize">{item.condition}</span>
-                    </p>
                   )}
                   {item.passive_effect && item.passive_effect.length > 0 && (
                     <div className="text-sm text-accent-secondary space-y-1">

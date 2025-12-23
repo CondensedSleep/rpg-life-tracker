@@ -59,6 +59,7 @@ export interface StatModifier {
 
 export interface MechanicalEffect {
   type?: 'stat_modifier' | 'advantage' | 'disadvantage' | 'custom'
+  applies_to?: ('ability_checks' | 'saving_throws' | 'passive_modifier')[]  // When this effect applies
   affected_stats?: string[]  // For advantage/disadvantage
   stat_modifiers?: StatModifier[]  // For stat_modifier type with individual modifiers per stat
   modifier?: number  // For advantage/disadvantage with a flat modifier
@@ -79,6 +80,7 @@ export interface Trait {
 
 export interface PassiveEffect {
   type?: 'stat_modifier' | 'advantage' | 'disadvantage' | 'custom'
+  applies_to?: ('ability_checks' | 'saving_throws' | 'passive_modifier')[]  // When this effect applies
   affected_stats?: string[]  // For advantage/disadvantage
   stat_modifiers?: StatModifier[]  // For stat_modifier type with individual modifiers per stat
   modifier?: number  // For advantage/disadvantage with a flat modifier
@@ -202,6 +204,7 @@ export interface ActionLog {
   ability_used: string | null
   roll_value: number | null
   modifier_value: number | null
+  modifier_breakdown: Array<{ label: string; value: number }> | null
   total_value: number | null
   difficulty_class: number | null
   had_advantage: boolean | null
