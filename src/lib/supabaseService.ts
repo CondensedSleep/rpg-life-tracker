@@ -462,3 +462,40 @@ export async function spendHitDie(characterId: string) {
     error: null,
   }
 }
+// ============================================================================
+// CORE STATS & ABILITIES - INITIAL VALUES
+// ============================================================================
+
+export async function updateCoreStatBaseValue(characterId: string, statName: string, newBaseValue: number) {
+  const { data, error } = await supabase
+    .from('core_stats')
+    .update({ base_value: newBaseValue })
+    .eq('character_id', characterId)
+    .eq('stat_name', statName)
+    .select()
+    .single()
+
+  // Recalculate ability values since they depend on core stats
+  if (!error && data) {
+    await recalculateAbilityValues(characterId)
+  }
+
+  return { data, error }
+}
+
+export async function updateAbilityBaseValue(characterId: string, abilityName: string, newBaseValue: number) {
+  const { data, error } = await supabase
+    .from('abilities')
+    .update({ base_value: newBaseValue })
+    .eq('character_id', characterId)
+    .eq('ability_name', abilityName)
+    .select()
+    .single()
+
+  // Recalculate ability values
+  if (!error && data) {
+    await recalculateAbilityValues(characterId)
+  }
+
+  return { data, error }
+}

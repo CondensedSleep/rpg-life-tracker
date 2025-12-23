@@ -8,6 +8,7 @@ import { TraitForm } from '@/components/character/TraitForm'
 import { InventoryForm } from '@/components/character/InventoryForm'
 import { QuickLogForm } from '@/components/QuickLogForm'
 import { ActiveEffects } from '@/components/ActiveEffects'
+import { EditInitialValuesForm } from '@/components/EditInitialValuesForm'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
@@ -21,7 +22,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Plus, Edit2, Trash2, RefreshCw, Moon, AlertTriangle } from 'lucide-react'
-import { deleteTrait, deleteInventoryItem, levelUpCharacter, takeLongRest as takeLongRestService } from '@/lib/supabaseService'
+import { deleteTrait, deleteInventoryItem, levelUpCharacter, takeLongRest as takeLongRestService, updateCoreStatBaseValue, updateAbilityBaseValue } from '@/lib/supabaseService'
 import { recalculateAbilityValues } from '@/lib/abilityService'
 import { getTodayLocalDate } from '@/lib/dateUtils'
 import { loadDataFromSupabase } from '@/lib/loadSeedData'
@@ -78,6 +79,10 @@ export function Dashboard() {
 
   // Level up modal
   const [showLevelUpModal, setShowLevelUpModal] = useState(false)
+
+  // Edit initial values modal
+  const [editingItem, setEditingItem] = useState<any>(null)
+  const [editingItemType, setEditingItemType] = useState<'stat' | 'ability' | null>(null)
   const [selectedAbilityForLevelUp, setSelectedAbilityForLevelUp] = useState<string | null>(null)
   const [isLevelingUp, setIsLevelingUp] = useState(false)
 
@@ -130,6 +135,23 @@ export function Dashboard() {
     await recalculateAbilityValues(character.id)
     // Force re-fetch of data by navigating
     window.location.reload()
+  }
+
+  const handleEditInitialValue = async (newValue: number) => {
+    if (!character || !editingItem || !editingItemType) return
+
+    try {
+      if (editingItemType === 'stat') {
+        await updateCoreStatBaseValue(character.id, editingItem.stat_name, newValue)
+      } else {
+        await updateAbilityBaseValue(character.id, editingItem.ability_name, newValue)
+      }
+      // Reload to reflect changes
+      window.location.reload()
+    } catch (error) {
+      console.error('Failed to update initial value:', error)
+      throw error
+    }
   }
 
   const handleLevelUp = async () => {
@@ -411,8 +433,12 @@ export function Dashboard() {
               return (
                 <div
                   key={statName}
-                  className="p-4 bg-bg-secondary rounded-lg border border-border frosted text-center flex flex-col justify-center"
+                  className="p-4 bg-bg-secondary rounded-lg border border-border frosted text-center flex flex-col justify-center group hover:bg-bg-tertiary transition-colors cursor-pointer"
                   style={{ height: '120px' }}
+                  onClick={() => {
+                    setEditingItem(stat)
+                    setEditingItemType('stat')
+                  }}
                 >
                   <div className="text-xs uppercase font-bold text-text-secondary mb-1">
                     {statName}
@@ -422,6 +448,9 @@ export function Dashboard() {
                   </div>
                   <div className="text-sm text-text-secondary">
                     ({stat.modifier >= 0 ? '+' : ''}{stat.modifier})
+                  </div>
+                  <div className="text-xs text-text-secondary mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Initial: {stat.base_value}
                   </div>
                 </div>
               )
@@ -457,37 +486,50 @@ export function Dashboard() {
                     const hasModifiers = modifierCalc.breakdown.length > 1
 
                     return (
-                      <div key={ability.id} className="flex justify-between text-sm">
+                      <div key={ability.id} className="flex justify-between text-sm items-center group hover:bg-bg-tertiary/50 px-2 py-1 rounded transition-colors">
                         <span className="uppercase text-xs text-text-secondary">
                           {ability.ability_name}
                         </span>
-                        <span
-                          className="font-semibold text-accent-secondary"
-                          title={
-                            hasModifiers
-                              ? modifierCalc.breakdown
-                                  .map((b) => `${b.source}: ${b.value >= 0 ? '+' : ''}${b.value}`)
-                                  .join('\n')
-                              : undefined
-                          }
-                        >
-                          {displayValue >= 0 ? '+' : ''}{displayValue}
-                          {hasModifiers && (
-                            <span className="text-accent-warning ml-1" title="Modified by traits/items">
-                              *
-                            </span>
-                          )}
-                          {modifierCalc.hasAdvantage && (
-                            <span className="text-accent-success ml-1" title="Has advantage">
-                              ↑
-                            </span>
-                          )}
-                          {modifierCalc.hasDisadvantage && (
-                            <span className="text-accent-primary ml-1" title="Has disadvantage">
-                              ↓
-                            </span>
-                          )}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="font-semibold text-accent-secondary"
+                            title={
+                              hasModifiers
+                                ? modifierCalc.breakdown
+                                    .map((b) => `${b.source}: ${b.value >= 0 ? '+' : ''}${b.value}`)
+                                    .join('\n')
+                                : undefined
+                            }
+                          >
+                            {displayValue >= 0 ? '+' : ''}{displayValue}
+                            {hasModifiers && (
+                              <span className="text-accent-warning ml-1" title="Modified by traits/items">
+                                *
+                              </span>
+                            )}
+                            {modifierCalc.hasAdvantage && (
+                              <span className="text-accent-success ml-1" title="Has advantage">
+                                ↑
+                              </span>
+                            )}
+                            {modifierCalc.hasDisadvantage && (
+                              <span className="text-accent-primary ml-1" title="Has disadvantage">
+                                ↓
+                              </span>
+                            )}
+                          </span>
+                          <button
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setEditingItem(ability)
+                              setEditingItemType('ability')
+                            }}
+                            title={`Edit initial value (currently ${ability.base_value})`}
+                          >
+                            <Edit2 className="w-3 h-3 text-text-secondary hover:text-accent-secondary" />
+                          </button>
+                        </div>
                       </div>
                     )
                   })}
@@ -499,7 +541,7 @@ export function Dashboard() {
 
         {/* Column 3: Traits (6 cols = 30% width) */}
         <div className="lg:col-span-6">
-          <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted h-full">
+          <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted flex flex-col h-[516px]">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-semibold">Traits</h3>
               <Button size="sm" onClick={() => setIsCreatingTrait(true)}>
@@ -507,7 +549,7 @@ export function Dashboard() {
                 Add
               </Button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 overflow-y-auto flex-1 -mx-4 px-4">
               {traits.length === 0 ? (
                 <p className="text-sm text-text-secondary">No traits yet</p>
               ) : (
@@ -595,7 +637,7 @@ export function Dashboard() {
 
         {/* Column 4: Inventory (6 cols = 30% width) */}
         <div className="lg:col-span-6">
-          <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted h-full">
+          <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted flex flex-col h-[516px]">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-semibold">Inventory</h3>
               <Button size="sm" onClick={() => setIsCreatingInventory(true)}>
@@ -603,7 +645,7 @@ export function Dashboard() {
                 Add
               </Button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 overflow-y-auto flex-1 -mx-4 px-4">
               {inventory.length === 0 ? (
                 <p className="text-sm text-text-secondary">No items yet</p>
               ) : (
@@ -897,7 +939,18 @@ export function Dashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Initial Values Modal */}
+      <EditInitialValuesForm
+        isOpen={editingItem !== null}
+        item={editingItem}
+        itemType={editingItemType || 'stat'}
+        onSave={handleEditInitialValue}
+        onCancel={() => {
+          setEditingItem(null)
+          setEditingItemType(null)
+        }}
+      />
     </div>
   )
 }
-
