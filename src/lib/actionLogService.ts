@@ -83,7 +83,8 @@ export async function logAbilityCheck(params: {
           state: dailyRoll?.day_state || 'normal',
           affectedStats: dailyRoll?.affected_stats || [],
           selectedStat: dailyRoll?.affected_stats?.[0],
-        }
+        },
+        'ability_checks' // This is an ability check roll
       )
     : { total: 0, hasAdvantage: false, hasDisadvantage: false }
 
@@ -271,7 +272,8 @@ export async function logSavingThrow(params: {
           state: dailyRoll?.day_state || 'normal',
           affectedStats: dailyRoll?.affected_stats || [],
           selectedStat: dailyRoll?.affected_stats?.[0],
-        }
+        },
+        'saving_throws' // This is a saving throw roll
       )
     : { total: 0, hasAdvantage: false, hasDisadvantage: false }
 

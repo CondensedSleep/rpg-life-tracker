@@ -14,12 +14,81 @@ import {
 } from '@/lib/actionLogService'
 import { loadDataFromSupabase } from '@/lib/loadSeedData'
 import type { z } from 'zod'
+import type { Trait, InventoryItem, MechanicalEffect, PassiveEffect } from '@/types'
 
 type ActionType = 'ability_check' | 'saving_throw' | 'custom_effect'
 
 type AbilityCheckForm = z.infer<typeof abilityCheckSchema>
 type SavingThrowForm = z.infer<typeof savingThrowSchema>
 type CustomEffectForm = z.infer<typeof customEffectFormSchema>
+
+// Helper function to calculate auto-fill values for a given ability and action type
+function calculateAutoFillValues(
+  abilityName: string | null,
+  actionType: 'ability_checks' | 'saving_throws',
+  traits: Trait[],
+  inventory: InventoryItem[]
+): {
+  hasAdvantage: boolean
+  hasDisadvantage: boolean
+} {
+  if (!abilityName) {
+    return { hasAdvantage: false, hasDisadvantage: false }
+  }
+
+  let hasAdvantage = false
+  let hasDisadvantage = false
+
+  // Check traits for applicable effects
+  for (const trait of traits) {
+    if (!trait.is_active || !trait.mechanical_effect) continue
+
+    for (const effect of trait.mechanical_effect) {
+      // Check if the effect applies to this action type
+      const appliesToThisAction = 
+        !effect.applies_to || 
+        effect.applies_to.length === 0 || 
+        effect.applies_to.includes(actionType)
+
+      if (!appliesToThisAction) continue
+
+      // Check for advantage/disadvantage on this ability
+      if (effect.type === 'advantage' && effect.affected_stats?.includes(abilityName)) {
+        hasAdvantage = true
+      }
+
+      if (effect.type === 'disadvantage' && effect.affected_stats?.includes(abilityName)) {
+        hasDisadvantage = true
+      }
+    }
+  }
+
+  // Check equipped inventory items for applicable effects
+  for (const item of inventory) {
+    if (!item.is_equipped || !item.passive_effect) continue
+
+    for (const effect of item.passive_effect) {
+      // Check if the effect applies to this action type
+      const appliesToThisAction = 
+        !effect.applies_to || 
+        effect.applies_to.length === 0 || 
+        effect.applies_to.includes(actionType)
+
+      if (!appliesToThisAction) continue
+
+      // Check for advantage/disadvantage on this ability
+      if (effect.type === 'advantage' && effect.affected_stats?.includes(abilityName)) {
+        hasAdvantage = true
+      }
+
+      if (effect.type === 'disadvantage' && effect.affected_stats?.includes(abilityName)) {
+        hasDisadvantage = true
+      }
+    }
+  }
+
+  return { hasAdvantage, hasDisadvantage }
+}
 
 export function QuickLogForm() {
   const [activeTab, setActiveTab] = useState<ActionType>('ability_check')
@@ -28,6 +97,7 @@ export function QuickLogForm() {
   const character = useStore((state) => state.character)
   const abilities = useStore((state) => state.abilities)
   const inventory = useStore((state) => state.inventory)
+  const traits = useStore((state) => state.traits)
 
   // Form for ability check
   const abilityCheckForm = useForm<AbilityCheckForm>({
@@ -259,6 +329,23 @@ export function QuickLogForm() {
             </label>
             <select
               {...abilityCheckForm.register('ability_name')}
+              onChange={(e) => {
+                // Update form value
+                abilityCheckForm.setValue('ability_name', e.target.value || null)
+                
+                // Calculate auto-fill values
+                const autoFill = calculateAutoFillValues(
+                  e.target.value || null,
+                  'ability_checks',
+                  traits,
+                  inventory
+                )
+                
+                // Update advantage/disadvantage checkboxes only
+                // Additional Modifier field is reserved for manual overrides
+                abilityCheckForm.setValue('had_advantage', autoFill.hasAdvantage)
+                abilityCheckForm.setValue('had_disadvantage', autoFill.hasDisadvantage)
+              }}
               className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-md"
             >
               <option value="">None</option>
@@ -395,6 +482,23 @@ export function QuickLogForm() {
             </label>
             <select
               {...savingThrowForm.register('ability_name')}
+              onChange={(e) => {
+                // Update form value
+                savingThrowForm.setValue('ability_name', e.target.value || null)
+                
+                // Calculate auto-fill values
+                const autoFill = calculateAutoFillValues(
+                  e.target.value || null,
+                  'saving_throws',
+                  traits,
+                  inventory
+                )
+                
+                // Update advantage/disadvantage checkboxes only
+                // Additional Modifier field is reserved for manual overrides
+                savingThrowForm.setValue('had_advantage', autoFill.hasAdvantage)
+                savingThrowForm.setValue('had_disadvantage', autoFill.hasDisadvantage)
+              }}
               className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-md"
             >
               <option value="">None</option>

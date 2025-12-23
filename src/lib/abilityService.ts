@@ -50,7 +50,8 @@ export async function recalculateAbilityValues(
         {
           state: 'normal', // Don't include day state in stored values
           affectedStats: [],
-        }
+        },
+        'passive_modifier' // This is for passive display, not active rolls
       )
 
       return {

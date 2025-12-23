@@ -433,24 +433,24 @@ export function Dashboard() {
               return (
                 <div
                   key={statName}
-                  className="p-4 bg-bg-secondary rounded-lg border border-border frosted text-center flex flex-col justify-center group hover:bg-bg-tertiary transition-colors cursor-pointer"
+                  className="p-4 bg-bg-secondary rounded-lg border border-border frosted text-center flex flex-col justify-center"
                   style={{ height: '120px' }}
-                  onClick={() => {
-                    setEditingItem(stat)
-                    setEditingItemType('stat')
-                  }}
                 >
-                  <div className="text-xs uppercase font-bold text-text-secondary mb-1">
+                  <div className="text-sm uppercase font-bold text-text-secondary mb-1">
                     {statName}
                   </div>
-                  <div className="text-3xl font-bold text-accent-secondary">
+                  <div 
+                    className="text-5xl font-bold text-accent-secondary cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      setEditingItem(stat)
+                      setEditingItemType('stat')
+                    }}
+                    title="Click to edit initial value"
+                  >
                     {stat.current_value}
                   </div>
-                  <div className="text-sm text-text-secondary">
+                  <div className="text-base text-text-secondary">
                     ({stat.modifier >= 0 ? '+' : ''}{stat.modifier})
-                  </div>
-                  <div className="text-xs text-text-secondary mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Initial: {stat.base_value}
                   </div>
                 </div>
               )
@@ -479,57 +479,43 @@ export function Dashboard() {
                         state: todayRoll?.day_state || 'normal',
                         affectedStats: todayRoll?.affected_stats || [],
                         selectedStat: todayRoll?.affected_stats?.[0],
-                      }
+                      },
+                      'passive_modifier' // This is for passive display on Dashboard
                     )
 
                     const displayValue = modifierCalc.total
                     const hasModifiers = modifierCalc.breakdown.length > 1
 
                     return (
-                      <div key={ability.id} className="flex justify-between text-sm items-center group hover:bg-bg-tertiary/50 px-2 py-1 rounded transition-colors">
+                      <div key={ability.id} className="flex justify-between text-sm">
                         <span className="uppercase text-xs text-text-secondary">
                           {ability.ability_name}
                         </span>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="font-semibold text-accent-secondary"
-                            title={
-                              hasModifiers
-                                ? modifierCalc.breakdown
-                                    .map((b) => `${b.source}: ${b.value >= 0 ? '+' : ''}${b.value}`)
-                                    .join('\n')
-                                : undefined
-                            }
-                          >
-                            {displayValue >= 0 ? '+' : ''}{displayValue}
-                            {hasModifiers && (
-                              <span className="text-accent-warning ml-1" title="Modified by traits/items">
-                                *
-                              </span>
-                            )}
-                            {modifierCalc.hasAdvantage && (
-                              <span className="text-accent-success ml-1" title="Has advantage">
-                                ↑
-                              </span>
-                            )}
-                            {modifierCalc.hasDisadvantage && (
-                              <span className="text-accent-primary ml-1" title="Has disadvantage">
-                                ↓
-                              </span>
-                            )}
-                          </span>
-                          <button
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setEditingItem(ability)
-                              setEditingItemType('ability')
-                            }}
-                            title={`Edit initial value (currently ${ability.base_value})`}
-                          >
-                            <Edit2 className="w-3 h-3 text-text-secondary hover:text-accent-secondary" />
-                          </button>
-                        </div>
+                        <span
+                          className="font-semibold text-accent-secondary cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => {
+                            setEditingItem(ability)
+                            setEditingItemType('ability')
+                          }}
+                          title="Click to edit initial value"
+                        >
+                          {displayValue >= 0 ? '+' : ''}{displayValue}
+                          {hasModifiers && (
+                            <span className="text-accent-warning ml-1" title="Modified by traits/items">
+                              *
+                            </span>
+                          )}
+                          {modifierCalc.hasAdvantage && (
+                            <span className="text-accent-success ml-1" title="Has advantage">
+                              ↑
+                            </span>
+                          )}
+                          {modifierCalc.hasDisadvantage && (
+                            <span className="text-accent-primary ml-1" title="Has disadvantage">
+                              ↓
+                            </span>
+                          )}
+                        </span>
                       </div>
                     )
                   })}
@@ -542,14 +528,14 @@ export function Dashboard() {
         {/* Column 3: Traits (6 cols = 30% width) */}
         <div className="lg:col-span-6">
           <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted flex flex-col h-[516px]">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-2 -mt-1">
               <h3 className="text-lg font-semibold">Traits</h3>
               <Button size="sm" onClick={() => setIsCreatingTrait(true)}>
                 <Plus className="w-4 h-4 mr-1" />
                 Add
               </Button>
             </div>
-            <div className="space-y-2 overflow-y-auto flex-1 -mx-4 px-4">
+            <div className="space-y-1 overflow-y-auto flex-1 -mx-4 px-4">
               {traits.length === 0 ? (
                 <p className="text-sm text-text-secondary">No traits yet</p>
               ) : (
@@ -583,7 +569,7 @@ export function Dashboard() {
                                 )}
                                 {effect.type === 'advantage' && (
                                   <span>
-                                    Advantage on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
+                                    Advantage{effect.modifier ? ` (${effect.modifier > 0 ? '+' : ''}${effect.modifier})` : ''} on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
                                       ? effect.affected_stats.slice(0, -1).join(', ') + ', & ' + effect.affected_stats[effect.affected_stats.length - 1]
                                       : effect.affected_stats?.join(', ')}</span>
                                     {effect.applies_to && effect.applies_to.length > 0 && (
@@ -593,7 +579,7 @@ export function Dashboard() {
                                 )}
                                 {effect.type === 'disadvantage' && (
                                   <span>
-                                    Disadvantage on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
+                                    Disadvantage{effect.modifier ? ` (${effect.modifier > 0 ? '+' : ''}${effect.modifier})` : ''} on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
                                       ? effect.affected_stats.slice(0, -1).join(', ') + ', & ' + effect.affected_stats[effect.affected_stats.length - 1]
                                       : effect.affected_stats?.join(', ')}</span>
                                     {effect.applies_to && effect.applies_to.length > 0 && (
@@ -638,14 +624,14 @@ export function Dashboard() {
         {/* Column 4: Inventory (6 cols = 30% width) */}
         <div className="lg:col-span-6">
           <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted flex flex-col h-[516px]">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-2 -mt-1">
               <h3 className="text-lg font-semibold">Inventory</h3>
               <Button size="sm" onClick={() => setIsCreatingInventory(true)}>
                 <Plus className="w-4 h-4 mr-1" />
                 Add
               </Button>
             </div>
-            <div className="space-y-2 overflow-y-auto flex-1 -mx-4 px-4">
+            <div className="space-y-1 overflow-y-auto flex-1 -mx-4 px-4">
               {inventory.length === 0 ? (
                 <p className="text-sm text-text-secondary">No items yet</p>
               ) : (
@@ -682,7 +668,7 @@ export function Dashboard() {
                                 )}
                                 {effect.type === 'advantage' && (
                                   <span>
-                                    Advantage on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
+                                    Advantage{effect.modifier ? ` (${effect.modifier > 0 ? '+' : ''}${effect.modifier})` : ''} on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
                                       ? effect.affected_stats.slice(0, -1).join(', ') + ', & ' + effect.affected_stats[effect.affected_stats.length - 1]
                                       : effect.affected_stats?.join(', ')}</span>
                                     {effect.applies_to && effect.applies_to.length > 0 && (
@@ -692,7 +678,7 @@ export function Dashboard() {
                                 )}
                                 {effect.type === 'disadvantage' && (
                                   <span>
-                                    Disadvantage on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
+                                    Disadvantage{effect.modifier ? ` (${effect.modifier > 0 ? '+' : ''}${effect.modifier})` : ''} on <span className="uppercase">{effect.affected_stats && effect.affected_stats.length > 1 
                                       ? effect.affected_stats.slice(0, -1).join(', ') + ', & ' + effect.affected_stats[effect.affected_stats.length - 1]
                                       : effect.affected_stats?.join(', ')}</span>
                                     {effect.applies_to && effect.applies_to.length > 0 && (

@@ -222,7 +222,8 @@ export function calculateTotalModifier(
     state: DayState
     affectedStats?: CoreStatName[]
     selectedStat?: CoreStatName
-  }
+  },
+  context?: 'passive_modifier' | 'ability_checks' | 'saving_throws' // Context for applies_to filtering
 ): CalculatedModifier {
   const breakdown: ModifierBreakdown[] = []
   let total = baseModifier
@@ -265,18 +266,54 @@ export function calculateTotalModifier(
       // Handle advantage/disadvantage
       if (effect.type === 'advantage' && effect.affected_stats?.includes(abilityName)) {
         hasAdvantage = true
-        breakdown.push({
-          source: `${trait.trait_name} (advantage)`,
-          value: 0,
-        })
+        
+        // Check if flat modifier should be applied based on context and applies_to
+        const modifierValue = effect.modifier || 0
+        const shouldApplyModifier = modifierValue !== 0 && (
+          !context || // No context specified, apply everything (backward compatibility)
+          !effect.applies_to || // No applies_to specified, apply to everything
+          effect.applies_to.length === 0 || // Empty applies_to, apply to everything
+          effect.applies_to.includes(context) // Explicitly includes this context
+        )
+        
+        if (shouldApplyModifier) {
+          total += modifierValue
+          breakdown.push({
+            source: `${trait.trait_name} (advantage)`,
+            value: modifierValue,
+          })
+        } else {
+          breakdown.push({
+            source: `${trait.trait_name} (advantage)`,
+            value: 0,
+          })
+        }
       }
 
       if (effect.type === 'disadvantage' && effect.affected_stats?.includes(abilityName)) {
         hasDisadvantage = true
-        breakdown.push({
-          source: `${trait.trait_name} (disadvantage)`,
-          value: 0,
-        })
+        
+        // Check if flat modifier should be applied based on context and applies_to
+        const modifierValue = effect.modifier || 0
+        const shouldApplyModifier = modifierValue !== 0 && (
+          !context || // No context specified, apply everything (backward compatibility)
+          !effect.applies_to || // No applies_to specified, apply to everything
+          effect.applies_to.length === 0 || // Empty applies_to, apply to everything
+          effect.applies_to.includes(context) // Explicitly includes this context
+        )
+        
+        if (shouldApplyModifier) {
+          total += modifierValue
+          breakdown.push({
+            source: `${trait.trait_name} (disadvantage)`,
+            value: modifierValue,
+          })
+        } else {
+          breakdown.push({
+            source: `${trait.trait_name} (disadvantage)`,
+            value: 0,
+          })
+        }
       }
     }
   }
@@ -307,18 +344,54 @@ export function calculateTotalModifier(
       // Handle advantage/disadvantage
       if (effect.type === 'advantage' && effect.affected_stats?.includes(abilityName)) {
         hasAdvantage = true
-        breakdown.push({
-          source: `${item.item_name} (advantage)`,
-          value: 0,
-        })
+        
+        // Check if flat modifier should be applied based on context and applies_to
+        const modifierValue = effect.modifier || 0
+        const shouldApplyModifier = modifierValue !== 0 && (
+          !context || // No context specified, apply everything (backward compatibility)
+          !effect.applies_to || // No applies_to specified, apply to everything
+          effect.applies_to.length === 0 || // Empty applies_to, apply to everything
+          effect.applies_to.includes(context) // Explicitly includes this context
+        )
+        
+        if (shouldApplyModifier) {
+          total += modifierValue
+          breakdown.push({
+            source: `${item.item_name} (advantage)`,
+            value: modifierValue,
+          })
+        } else {
+          breakdown.push({
+            source: `${item.item_name} (advantage)`,
+            value: 0,
+          })
+        }
       }
 
       if (effect.type === 'disadvantage' && effect.affected_stats?.includes(abilityName)) {
         hasDisadvantage = true
-        breakdown.push({
-          source: `${item.item_name} (disadvantage)`,
-          value: 0,
-        })
+        
+        // Check if flat modifier should be applied based on context and applies_to
+        const modifierValue = effect.modifier || 0
+        const shouldApplyModifier = modifierValue !== 0 && (
+          !context || // No context specified, apply everything (backward compatibility)
+          !effect.applies_to || // No applies_to specified, apply to everything
+          effect.applies_to.length === 0 || // Empty applies_to, apply to everything
+          effect.applies_to.includes(context) // Explicitly includes this context
+        )
+        
+        if (shouldApplyModifier) {
+          total += modifierValue
+          breakdown.push({
+            source: `${item.item_name} (disadvantage)`,
+            value: modifierValue,
+          })
+        } else {
+          breakdown.push({
+            source: `${item.item_name} (disadvantage)`,
+            value: 0,
+          })
+        }
       }
     }
   }
@@ -343,18 +416,54 @@ export function calculateTotalModifier(
     // Handle advantage/disadvantage
     if (effect.effect_type === 'advantage' && effect.affected_stats?.includes(abilityName)) {
       hasAdvantage = true
-      breakdown.push({
-        source: `${effect.effect_name} (advantage)`,
-        value: 0,
-      })
+      
+      // Check if flat modifier should be applied based on context and applies_to
+      const modifierValue = effect.modifier || 0
+      const shouldApplyModifier = modifierValue !== 0 && (
+        !context || // No context specified, apply everything (backward compatibility)
+        !effect.applies_to || // No applies_to specified, apply to everything
+        effect.applies_to.length === 0 || // Empty applies_to, apply to everything
+        effect.applies_to.includes(context) // Explicitly includes this context
+      )
+      
+      if (shouldApplyModifier) {
+        total += modifierValue
+        breakdown.push({
+          source: `${effect.effect_name} (advantage)`,
+          value: modifierValue,
+        })
+      } else {
+        breakdown.push({
+          source: `${effect.effect_name} (advantage)`,
+          value: 0,
+        })
+      }
     }
 
     if (effect.effect_type === 'disadvantage' && effect.affected_stats?.includes(abilityName)) {
       hasDisadvantage = true
-      breakdown.push({
-        source: `${effect.effect_name} (disadvantage)`,
-        value: 0,
-      })
+      
+      // Check if flat modifier should be applied based on context and applies_to
+      const modifierValue = effect.modifier || 0
+      const shouldApplyModifier = modifierValue !== 0 && (
+        !context || // No context specified, apply everything (backward compatibility)
+        !effect.applies_to || // No applies_to specified, apply to everything
+        effect.applies_to.length === 0 || // Empty applies_to, apply to everything
+        effect.applies_to.includes(context) // Explicitly includes this context
+      )
+      
+      if (shouldApplyModifier) {
+        total += modifierValue
+        breakdown.push({
+          source: `${effect.effect_name} (disadvantage)`,
+          value: modifierValue,
+        })
+      } else {
+        breakdown.push({
+          source: `${effect.effect_name} (disadvantage)`,
+          value: 0,
+        })
+      }
     }
   }
 
