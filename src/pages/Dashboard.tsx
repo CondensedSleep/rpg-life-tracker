@@ -26,6 +26,7 @@ import { deleteTrait, deleteInventoryItem, levelUpCharacter, takeLongRest as tak
 import { recalculateAbilityValues } from '@/lib/abilityService'
 import { getTodayLocalDate } from '@/lib/dateUtils'
 import { loadDataFromSupabase } from '@/lib/loadSeedData'
+import { supabase } from '@/lib/supabase'
 
 // Helper function to format applies_to field for display
 function formatAppliesTo(appliesTo?: string[]): string {
@@ -135,6 +136,47 @@ export function Dashboard() {
     await recalculateAbilityValues(character.id)
     // Force re-fetch of data by navigating
     window.location.reload()
+  }
+
+  const handleResetProgress = async () => {
+    if (!character) return
+    
+    const confirmed = confirm(
+      '⚠️ Reset All Progress?\n\n' +
+      'This will:\n' +
+      '• Set your XP to 0\n' +
+      '• Reset all quest completions\n' +
+      '• Mark all quests as incomplete\n\n' +
+      'This cannot be undone. Continue?'
+    )
+    
+    if (!confirmed) return
+    
+    try {
+      // Reset character XP
+      await supabase
+        .from('characters')
+        .update({ current_xp: 0 })
+        .eq('id', character.id)
+      
+      // Reset all quest completions
+      await supabase
+        .from('quests')
+        .update({
+          is_completed: false,
+          times_completed: 0,
+          completed_at: null
+        })
+        .eq('character_id', character.id)
+      
+      // Reload all data
+      await loadDataFromSupabase(character.user_id)
+      
+      alert('✅ Progress reset successfully!')
+    } catch (error) {
+      console.error('Error resetting progress:', error)
+      alert('❌ Failed to reset progress. Check console for details.')
+    }
   }
 
   const handleEditInitialValue = async (newValue: number) => {
@@ -281,16 +323,25 @@ export function Dashboard() {
           <div>
             <div className="flex justify-between text-sm mb-2">
               <span>XP: {character.current_xp} / {character.xp_to_next_level}</span>
-              {isReadyToLevelUp ? (
+              <div className="flex gap-2 items-center">
+                {isReadyToLevelUp ? (
+                  <button
+                    onClick={() => setShowLevelUpModal(true)}
+                    className="text-accent-warning font-bold hover:underline"
+                  >
+                    🌟 Ready to Level Up!
+                  </button>
+                ) : (
+                  <span className="text-text-secondary">Next Level: {character.level + 1}</span>
+                )}
                 <button
-                  onClick={() => setShowLevelUpModal(true)}
-                  className="text-accent-warning font-bold hover:underline"
+                  onClick={handleResetProgress}
+                  className="text-xs text-red-500 hover:text-red-400 opacity-50 hover:opacity-100 transition-opacity"
+                  title="Reset XP and quest completions"
                 >
-                  🌟 Ready to Level Up!
+                  Reset
                 </button>
-              ) : (
-                <span className="text-text-secondary">Next Level: {character.level + 1}</span>
-              )}
+              </div>
             </div>
             <div className="w-full bg-bg-tertiary rounded-full h-3">
               <div

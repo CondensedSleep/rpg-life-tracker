@@ -137,12 +137,26 @@ export function QuickLogForm() {
     defaultValues: {
       effect_name: '',
       effect_type: 'stat_modifier',
+      applies_to: [],
       affected_stats: [],
       stat_modifiers: [],
       modifier: null,
       description: null,
+      effects: [],
     },
   })
+
+  const [customEffectSubEffects, setCustomEffectSubEffects] = useState<Array<{
+    type: 'stat_modifier' | 'advantage' | 'disadvantage'
+    applies_to?: ('ability_checks' | 'saving_throws' | 'passive_modifier')[]
+    affected_stats?: string[]
+    stat_modifiers?: { stat: string; modifier: number }[]
+    modifier?: number | null
+  }>>([])
+
+  const [tempStatModifiers, setTempStatModifiers] = useState<Array<{ stat: string; modifier: number }>>([])
+  const [currentStatName, setCurrentStatName] = useState('')
+  const [currentStatModifier, setCurrentStatModifier] = useState<number | ''>('')
 
   const handleAbilityCheckSubmit = async (data: AbilityCheckForm) => {
     if (!character) return
@@ -253,10 +267,12 @@ export function QuickLogForm() {
         characterId: character.id,
         effectName: data.effect_name,
         effectType: data.effect_type,
+        appliesTo: data.applies_to,
         statModifiers: data.stat_modifiers,
         affectedStats: data.affected_stats,
         modifier: data.modifier,
         description: data.description,
+        effects: data.effects,
       })
 
       if (result.error) {
@@ -269,8 +285,12 @@ export function QuickLogForm() {
 
       alert('✅ Custom effect created! It will expire at midnight.')
 
-      // Reset form
+      // Reset form and temp state
       customEffectForm.reset()
+      setTempStatModifiers([])
+      setCustomEffectSubEffects([])
+      setCurrentStatName('')
+      setCurrentStatModifier('')
     } catch (error) {
       console.error('Error creating custom effect:', error)
       alert('An error occurred while creating the custom effect')
@@ -637,6 +657,7 @@ export function QuickLogForm() {
               type="text"
               {...customEffectForm.register('effect_name')}
               className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-md"
+              placeholder="e.g., Blessed by the Moon"
             />
             {customEffectForm.formState.errors.effect_name && (
               <p className="text-red-500 text-sm mt-1">
@@ -651,37 +672,275 @@ export function QuickLogForm() {
             </label>
             <select
               {...customEffectForm.register('effect_type')}
+              onChange={(e) => {
+                customEffectForm.setValue('effect_type', e.target.value as any)
+                // Reset other fields when type changes
+                customEffectForm.setValue('stat_modifiers', [])
+                customEffectForm.setValue('affected_stats', [])
+                customEffectForm.setValue('modifier', null)
+                customEffectForm.setValue('applies_to', [])
+                setTempStatModifiers([])
+                setCustomEffectSubEffects([])
+              }}
               className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-md"
             >
               <option value="stat_modifier">Stat Modifier</option>
               <option value="advantage">Advantage</option>
               <option value="disadvantage">Disadvantage</option>
-              <option value="custom">Custom</option>
+              <option value="custom">Custom (Multiple Effects)</option>
             </select>
           </div>
 
+          {/* Stat Modifier Type */}
           {customEffectForm.watch('effect_type') === 'stat_modifier' && (
-            <div className="p-4 bg-bg-tertiary rounded-md border border-border">
-              <p className="text-sm text-text-secondary mb-2">
-                Add stat modifiers (e.g., +2 to Athletics, -1 to Stealth)
-              </p>
-              <div className="space-y-2">
-                {/* Dynamic stat modifier fields */}
-                <div className="text-sm text-text-secondary">
-                  Coming soon: Dynamic stat modifier inputs
+            <div className="p-4 bg-bg-tertiary rounded-md border border-border space-y-3">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  When does this modifier apply?
+                </label>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={customEffectForm.watch('applies_to')?.includes('ability_checks') || false}
+                      onChange={(e) => {
+                        const current = customEffectForm.getValues('applies_to') || []
+                        if (e.target.checked) {
+                          customEffectForm.setValue('applies_to', [...current, 'ability_checks'])
+                        } else {
+                          customEffectForm.setValue('applies_to', current.filter(x => x !== 'ability_checks'))
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-border bg-bg-tertiary"
+                    />
+                    <span className="text-sm">Ability Checks</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={customEffectForm.watch('applies_to')?.includes('saving_throws') || false}
+                      onChange={(e) => {
+                        const current = customEffectForm.getValues('applies_to') || []
+                        if (e.target.checked) {
+                          customEffectForm.setValue('applies_to', [...current, 'saving_throws'])
+                        } else {
+                          customEffectForm.setValue('applies_to', current.filter(x => x !== 'saving_throws'))
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-border bg-bg-tertiary"
+                    />
+                    <span className="text-sm">Saving Throws</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={customEffectForm.watch('applies_to')?.includes('passive_modifier') || false}
+                      onChange={(e) => {
+                        const current = customEffectForm.getValues('applies_to') || []
+                        if (e.target.checked) {
+                          customEffectForm.setValue('applies_to', [...current, 'passive_modifier'])
+                        } else {
+                          customEffectForm.setValue('applies_to', current.filter(x => x !== 'passive_modifier'))
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-border bg-bg-tertiary"
+                    />
+                    <span className="text-sm">Passive Modifier (always active)</span>
+                  </label>
                 </div>
+                <p className="text-xs text-text-secondary mt-1">
+                  Leave all unchecked to apply to everything
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Add Stat Modifiers
+                </label>
+                <div className="flex gap-2 mb-2">
+                  <select
+                    value={currentStatName}
+                    onChange={(e) => setCurrentStatName(e.target.value)}
+                    className="flex-1 px-3 py-2 bg-bg-primary border border-border rounded-md text-sm"
+                  >
+                    <option value="">Select stat/ability...</option>
+                    {abilities.map((ability) => (
+                      <option key={ability.id} value={ability.ability_name}>
+                        {ability.ability_name}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="number"
+                    value={currentStatModifier}
+                    onChange={(e) => setCurrentStatModifier(e.target.value ? Number(e.target.value) : '')}
+                    placeholder="+2, -1, etc."
+                    className="w-24 px-3 py-2 bg-bg-primary border border-border rounded-md text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (currentStatName && currentStatModifier !== '') {
+                        const newMods = [...tempStatModifiers, { stat: currentStatName, modifier: Number(currentStatModifier) }]
+                        setTempStatModifiers(newMods)
+                        customEffectForm.setValue('stat_modifiers', newMods)
+                        setCurrentStatName('')
+                        setCurrentStatModifier('')
+                      }
+                    }}
+                    className="px-3 py-2 bg-accent-primary text-white rounded-md hover:bg-accent-primary/90 text-sm"
+                  >
+                    Add
+                  </button>
+                </div>
+
+                {tempStatModifiers.length > 0 && (
+                  <div className="space-y-1">
+                    {tempStatModifiers.map((mod, idx) => (
+                      <div key={idx} className="flex justify-between items-center p-2 bg-bg-primary rounded border border-border text-sm">
+                        <span>
+                          {mod.modifier > 0 ? '+' : ''}{mod.modifier} <span className="uppercase">{mod.stat}</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newMods = tempStatModifiers.filter((_, i) => i !== idx)
+                            setTempStatModifiers(newMods)
+                            customEffectForm.setValue('stat_modifiers', newMods)
+                          }}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
 
+          {/* Advantage/Disadvantage Type */}
           {(customEffectForm.watch('effect_type') === 'advantage' ||
             customEffectForm.watch('effect_type') === 'disadvantage') && (
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Affected Stats
-              </label>
+            <div className="p-4 bg-bg-tertiary rounded-md border border-border space-y-3">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  When does this {customEffectForm.watch('effect_type')} apply?
+                </label>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={customEffectForm.watch('applies_to')?.includes('ability_checks') || false}
+                      onChange={(e) => {
+                        const current = customEffectForm.getValues('applies_to') || []
+                        if (e.target.checked) {
+                          customEffectForm.setValue('applies_to', [...current, 'ability_checks'])
+                        } else {
+                          customEffectForm.setValue('applies_to', current.filter(x => x !== 'ability_checks'))
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-border bg-bg-tertiary"
+                    />
+                    <span className="text-sm">Ability Checks</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={customEffectForm.watch('applies_to')?.includes('saving_throws') || false}
+                      onChange={(e) => {
+                        const current = customEffectForm.getValues('applies_to') || []
+                        if (e.target.checked) {
+                          customEffectForm.setValue('applies_to', [...current, 'saving_throws'])
+                        } else {
+                          customEffectForm.setValue('applies_to', current.filter(x => x !== 'saving_throws'))
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-border bg-bg-tertiary"
+                    />
+                    <span className="text-sm">Saving Throws</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={customEffectForm.watch('applies_to')?.includes('passive_modifier') || false}
+                      onChange={(e) => {
+                        const current = customEffectForm.getValues('applies_to') || []
+                        if (e.target.checked) {
+                          customEffectForm.setValue('applies_to', [...current, 'passive_modifier'])
+                        } else {
+                          customEffectForm.setValue('applies_to', current.filter(x => x !== 'passive_modifier'))
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-border bg-bg-tertiary"
+                    />
+                    <span className="text-sm">Passive Modifier (always active)</span>
+                  </label>
+                </div>
+                <p className="text-xs text-text-secondary mt-1">
+                  Leave all unchecked to apply to everything
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Affected Stats/Abilities
+                </label>
+                <div className="space-y-2">
+                  {abilities.map((ability) => (
+                    <label key={ability.id} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={customEffectForm.watch('affected_stats')?.includes(ability.ability_name) || false}
+                        onChange={(e) => {
+                          const current = customEffectForm.getValues('affected_stats') || []
+                          if (e.target.checked) {
+                            customEffectForm.setValue('affected_stats', [...current, ability.ability_name])
+                          } else {
+                            customEffectForm.setValue('affected_stats', current.filter(x => x !== ability.ability_name))
+                          }
+                        }}
+                        className="w-4 h-4 rounded border-border bg-bg-tertiary"
+                      />
+                      <span className="text-sm uppercase">{ability.ability_name}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Flat Modifier (Optional)
+                </label>
+                <input
+                  type="number"
+                  {...customEffectForm.register('modifier', {
+                    setValueAs: (v) => v === '' || v === null ? null : Number(v)
+                  })}
+                  placeholder="+1, -2, etc."
+                  className="w-full px-3 py-2 bg-bg-primary border border-border rounded-md"
+                />
+                <p className="text-xs text-text-secondary mt-1">
+                  Additional bonus/penalty along with {customEffectForm.watch('effect_type')}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Custom Type - Multiple Effects */}
+          {customEffectForm.watch('effect_type') === 'custom' && (
+            <div className="p-4 bg-bg-tertiary rounded-md border border-border space-y-3">
+              <div className="text-sm text-accent-secondary mb-2">
+                Create multiple effects under one custom effect (expires at midnight)
+              </div>
+              
               <div className="text-sm text-text-secondary">
-                Coming soon: Multi-select for affected stats
+                Custom effects allow you to combine multiple modifiers, advantage/disadvantage effects, etc. into a single temporary buff or debuff.
+              </div>
+
+              <div className="text-sm text-text-secondary italic">
+                Note: Custom type with multiple sub-effects is complex. For now, use individual Stat Modifier or Advantage/Disadvantage effects.
               </div>
             </div>
           )}
@@ -693,6 +952,7 @@ export function QuickLogForm() {
             <textarea
               {...customEffectForm.register('description')}
               rows={2}
+              placeholder="Additional details about this effect..."
               className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-md"
             />
           </div>

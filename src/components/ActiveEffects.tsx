@@ -2,6 +2,23 @@ import { useStore } from '@/store'
 import { deleteCustomEffect } from '@/lib/actionLogService'
 import { loadDataFromSupabase } from '@/lib/loadSeedData'
 
+function formatAppliesTo(appliesTo?: ('ability_checks' | 'saving_throws' | 'passive_modifier')[] | null): string {
+  if (!appliesTo || appliesTo.length === 0) return 'applies to everything'
+  
+  const labels: Record<string, string> = {
+    'ability_checks': 'ability checks',
+    'saving_throws': 'saving throws',
+    'passive_modifier': 'passive modifiers'
+  }
+  
+  if (appliesTo.length === 1) {
+    return `(${labels[appliesTo[0]]})`
+  }
+  
+  const formatted = appliesTo.map(a => labels[a])
+  return `(${formatted.slice(0, -1).join(', ')} & ${formatted[formatted.length - 1]})`
+}
+
 export function ActiveEffects() {
   const character = useStore((state) => state.character)
   const customEffects = useStore((state) => state.customEffects)
@@ -76,16 +93,22 @@ export function ActiveEffects() {
                 {effect.effect_type === 'stat_modifier' &&
                   effect.stat_modifiers &&
                   effect.stat_modifiers.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {effect.stat_modifiers.map((mod, idx) => (
-                        <span
-                          key={idx}
-                          className="text-xs px-2 py-1 bg-bg-primary rounded border border-border"
-                        >
-                          {mod.stat}: {mod.modifier >= 0 ? '+' : ''}
-                          {mod.modifier}
-                        </span>
-                      ))}
+                    <div className="mt-2">
+                      <div className="flex flex-wrap gap-2">
+                        {effect.stat_modifiers.map((mod, idx) => (
+                          <span
+                            key={idx}
+                            className="text-xs px-2 py-1 bg-bg-primary rounded border border-border uppercase"
+                          >
+                            {mod.modifier >= 0 ? '+' : ''}{mod.modifier} {mod.stat}
+                          </span>
+                        ))}
+                      </div>
+                      {effect.applies_to && effect.applies_to.length > 0 && (
+                        <p className="text-xs text-text-secondary mt-1">
+                          {formatAppliesTo(effect.applies_to)}
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -94,15 +117,19 @@ export function ActiveEffects() {
                   effect.effect_type === 'disadvantage') &&
                   effect.affected_stats &&
                   effect.affected_stats.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {effect.affected_stats.map((stat, idx) => (
-                        <span
-                          key={idx}
-                          className="text-xs px-2 py-1 bg-bg-primary rounded border border-border"
-                        >
-                          {stat}
+                    <div className="mt-2">
+                      <p className="text-sm text-accent-secondary">
+                        {effect.effect_type === 'advantage' ? 'Advantage' : 'Disadvantage'}
+                        {effect.modifier ? ` (${effect.modifier > 0 ? '+' : ''}${effect.modifier})` : ''} on{' '}
+                        <span className="uppercase">
+                          {effect.affected_stats.join(', ')}
                         </span>
-                      ))}
+                      </p>
+                      {effect.applies_to && effect.applies_to.length > 0 && (
+                        <p className="text-xs text-text-secondary mt-1">
+                          {formatAppliesTo(effect.applies_to)}
+                        </p>
+                      )}
                     </div>
                   )}
 

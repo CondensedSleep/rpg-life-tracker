@@ -3,7 +3,7 @@
 // ============================================================================
 
 export type CoreStatName = 'body' | 'mind' | 'heart' | 'soul'
-export type QuestType = 'daily' | 'weekly' | 'monthly' | 'main'
+export type QuestType = 'main' | 'side' | 'recurring'
 export type DayState = 'difficult' | 'normal' | 'inspiration' | 'critical'
 export type TraitType = 'feature' | 'flaw' | 'passive'
 export type ItemType = 'tool' | 'comfort' | 'consumable' | 'debuff'
@@ -115,7 +115,7 @@ export interface Quest {
   character_id: string
   quest_name: string
   quest_type: QuestType
-  core_stat: CoreStatName
+  core_stat: CoreStatName[] // Changed to array to support multiple core stats
   abilities_used: string[] | null
   xp_reward: number
   difficulty_class: number | null
@@ -124,7 +124,20 @@ export interface Quest {
   description: string | null
   deadline: string | null
   is_active: boolean
+  is_completed: boolean
+  completed_at: string | null
+  parent_quest_id: string | null
+  quest_tree: QuestTreeNode[] | null
   created_at: string
+}
+
+export interface QuestTreeNode {
+  type: 'quest' | 'text'
+  id?: string // quest id if type is 'quest'
+  text?: string // text content if type is 'text'
+  completed?: boolean // for text nodes
+  completionCount?: number // for recurring quests
+  children?: QuestTreeNode[]
 }
 
 export interface MainQuestMilestone {
@@ -166,12 +179,21 @@ export interface CustomEffect {
   character_id: string
   effect_name: string
   effect_type: 'stat_modifier' | 'advantage' | 'disadvantage' | 'custom'
+  applies_to?: ('ability_checks' | 'saving_throws' | 'passive_modifier')[] | null
   affected_stats?: string[] | null
   stat_modifiers?: StatModifier[] | null
   modifier?: number | null
   description?: string | null
   created_at: string
   expires_at: string
+  // For custom type - stores multiple sub-effects as JSONB
+  effects?: {
+    type: 'stat_modifier' | 'advantage' | 'disadvantage'
+    applies_to?: ('ability_checks' | 'saving_throws' | 'passive_modifier')[] | null
+    affected_stats?: string[] | null
+    stat_modifiers?: StatModifier[] | null
+    modifier?: number | null
+  }[] | null
 }
 
 // ============================================================================

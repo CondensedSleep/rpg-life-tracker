@@ -1,6 +1,8 @@
+import { useStore } from '@/store'
 import type { Quest } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { QuestTreeDisplay } from './QuestTreeDisplay'
 import { Edit2, Trash2, CheckCircle } from 'lucide-react'
 
 interface QuestCardProps {
@@ -11,6 +13,8 @@ interface QuestCardProps {
 }
 
 export function QuestCard({ quest, onComplete, onEdit, onDelete }: QuestCardProps) {
+  const quests = useStore((state) => state.quests)
+  
   const getCoreStatColor = (coreStat: string) => {
     switch (coreStat) {
       case 'body':
@@ -29,15 +33,25 @@ export function QuestCard({ quest, onComplete, onEdit, onDelete }: QuestCardProp
   const isMainQuest = quest.quest_type === 'main'
   const isCompleted = isMainQuest && quest.times_completed > 0
 
+  // Ensure core_stat is always an array for display
+  const coreStats = Array.isArray(quest.core_stat) ? quest.core_stat : [quest.core_stat]
+
+  // Debug: Log quest tree
+  if (isMainQuest) {
+    console.log('Main Quest:', quest.quest_name, 'Tree:', quest.quest_tree)
+  }
+
   return (
     <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted hover:bg-bg-tertiary transition-colors">
       <div className="flex items-start justify-between gap-4 mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             <h3 className="text-lg font-bold">{quest.quest_name}</h3>
-            <Badge className={getCoreStatColor(quest.core_stat)}>
-              {quest.core_stat}
-            </Badge>
+            {coreStats.map((stat) => (
+              <Badge key={stat} className={getCoreStatColor(stat)}>
+                {stat}
+              </Badge>
+            ))}
             {isCompleted && (
               <Badge variant="outline" className="text-accent-success">
                 Completed
@@ -82,6 +96,18 @@ export function QuestCard({ quest, onComplete, onEdit, onDelete }: QuestCardProp
           </Button>
         </div>
       </div>
+
+      {/* Quest Tree Display */}
+      {quest.quest_tree && quest.quest_tree.length > 0 && (
+        <QuestTreeDisplay
+          tree={quest.quest_tree}
+          quests={quests}
+          onToggleNode={(nodeId) => {
+            // TODO: Implement tree node toggle logic
+            console.log('Toggle tree node:', nodeId)
+          }}
+        />
+      )}
 
       {/* Complete Button */}
       {(!isMainQuest || !isCompleted) && (

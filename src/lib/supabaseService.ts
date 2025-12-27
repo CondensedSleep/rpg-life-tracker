@@ -195,6 +195,8 @@ export async function createQuest(characterId: string, quest: Partial<Quest>) {
       deadline: quest.deadline,
       is_active: quest.is_active ?? true,
       times_completed: 0,
+      parent_quest_id: quest.parent_quest_id,
+      quest_tree: quest.quest_tree,
     }])
     .select()
     .single()

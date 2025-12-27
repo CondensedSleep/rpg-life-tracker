@@ -390,19 +390,23 @@ export async function createCustomEffect(params: {
   characterId: string
   effectName: string
   effectType: 'stat_modifier' | 'advantage' | 'disadvantage' | 'custom'
+  appliesTo?: ('ability_checks' | 'saving_throws' | 'passive_modifier')[] | null
   statModifiers?: { stat: string; modifier: number }[] | null
   affectedStats?: string[] | null
   modifier?: number | null
   description?: string | null
+  effects?: any[] | null
 }) {
   const {
     characterId,
     effectName,
     effectType,
+    appliesTo,
     statModifiers,
     affectedStats,
     modifier,
     description,
+    effects,
   } = params
 
   // Calculate expires_at (midnight tonight in local timezone)
@@ -416,10 +420,12 @@ export async function createCustomEffect(params: {
       character_id: characterId,
       effect_name: effectName,
       effect_type: effectType,
+      applies_to: appliesTo,
       stat_modifiers: statModifiers,
       affected_stats: affectedStats,
       modifier,
       description,
+      effects,
       expires_at: midnight.toISOString(),
     }])
     .select()

@@ -87,24 +87,35 @@ export const progressionMilestoneSchema = z.array(progressionMilestoneItemSchema
 
 export type ProgressionMilestoneFormValues = z.infer<typeof progressionMilestoneItemSchema>
 
+export const questTreeNodeSchema: z.ZodType<any> = z.lazy(() =>
+  z.object({
+    type: z.enum(['quest', 'text']),
+    id: z.string().uuid().optional(),
+    text: z.string().optional(),
+    completed: z.boolean().optional(),
+    completionCount: z.number().optional(),
+    children: z.array(questTreeNodeSchema).optional(),
+  })
+)
+
 export const questFormSchema = z.object({
   quest_name: z.string().min(1, 'Quest name is required').max(200),
-  quest_type: z.enum(['daily', 'weekly', 'monthly', 'main'], {
+  quest_type: z.enum(['main', 'side', 'recurring'], {
     required_error: 'Quest type is required',
   }),
-  core_stat: z.enum(['body', 'mind', 'heart', 'soul'], {
-    required_error: 'Core stat is required',
-  }),
+  core_stat: z.array(z.enum(['body', 'mind', 'heart', 'soul'])).min(1, 'At least one core stat is required'),
   abilities_used: z.array(z.string()).optional().nullable(),
-  xp_reward: z.number().min(0, 'XP reward must be positive').default(1),
-  difficulty_class: z.number().min(1).max(30).optional().nullable(),
+  xp_reward: z.coerce.number().min(0, 'XP reward must be positive').default(1),
+  difficulty_class: z.coerce.number().min(1).max(30).optional().nullable(),
   progression_milestone: progressionMilestoneSchema,
   description: z.string().optional().nullable(),
   deadline: z.string().optional().nullable(), // ISO date string
   is_active: z.boolean().default(true),
+  parent_quest_id: z.string().uuid().optional().nullable(),
+  quest_tree: z.array(questTreeNodeSchema).optional().nullable(),
 })
 
-export type QuestFormValues = z.infer<typeof questFormSchema>
+export type QuestFormValues = z.input<typeof questFormSchema>
 
 // ============================================================================
 // ACTION LOG VALIDATION SCHEMAS
@@ -143,10 +154,19 @@ export const customEffectFormSchema = z.object({
   effect_type: z.enum(['stat_modifier', 'advantage', 'disadvantage', 'custom'], {
     required_error: 'Effect type is required',
   }),
+  applies_to: z.array(z.enum(['ability_checks', 'saving_throws', 'passive_modifier'])).optional().nullable(),
   affected_stats: z.array(z.string()).optional().nullable(),
   stat_modifiers: z.array(statModifierSchema).optional().nullable(),
   modifier: z.number().optional().nullable(),
   description: z.string().optional().nullable(),
+  // For custom type - array of sub-effects
+  effects: z.array(z.object({
+    type: z.enum(['stat_modifier', 'advantage', 'disadvantage']),
+    applies_to: z.array(z.enum(['ability_checks', 'saving_throws', 'passive_modifier'])).optional().nullable(),
+    affected_stats: z.array(z.string()).optional().nullable(),
+    stat_modifiers: z.array(statModifierSchema).optional().nullable(),
+    modifier: z.number().optional().nullable(),
+  })).optional().nullable(),
 })
 
 export type CustomEffectFormValues = z.infer<typeof customEffectFormSchema>
