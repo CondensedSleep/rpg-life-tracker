@@ -18,14 +18,14 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation()
 
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary flex flex-col">
+    <div className="min-h-screen bg-bg-base text-text-primary flex flex-col">
       {/* Main Content */}
       <main className="flex-1 pb-20">
         {children}
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-bg-secondary border-t border-border frosted">
+      <nav className="fixed bottom-0 left-0 right-0 bg-bg-card border-t border-border-subtle shadow-card">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-4 gap-1">
             {navItems.map((item) => {
@@ -36,11 +36,11 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                   to={item.to}
                   className={`
                     flex flex-col items-center justify-center py-3 px-2
-                    transition-all duration-200 rounded-lg
+                    transition-all duration-200 corner-clip-sm
                     ${
                       isActive
-                        ? 'text-accent-primary bg-accent-primary/10'
-                        : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary'
+                        ? 'text-accent-red bg-accent-red/10'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-bg-card-secondary'
                     }
                   `}
                 >
