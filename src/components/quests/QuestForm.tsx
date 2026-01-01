@@ -131,7 +131,7 @@ export function QuestForm({ quest, onClose }: QuestFormProps) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-bg-card corner-clip border border-border-subtle max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-bg-secondary border-b border-border p-6 flex justify-between items-center">
+        <div className="sticky top-0 bg-bg-card border-b border-border-subtle p-6 flex justify-between items-center">
           <h2 className="text-2xl font-bold">
             {quest ? 'Edit Quest' : 'Create Quest'}
           </h2>
@@ -296,7 +296,7 @@ export function QuestForm({ quest, onClose }: QuestFormProps) {
                       </label>
                       <select
                         {...form.register(`progression_milestone.${index}.ability`)}
-                        className="w-full px-2 py-1 bg-bg-tertiary border border-border rounded text-sm"
+                        className="w-full px-2 py-1 bg-bg-card-secondary border-border-subtle corner-clip-sm text-sm"
                       >
                         <option value="">Select...</option>
                         {ABILITIES.map((ability) => (
@@ -317,7 +317,7 @@ export function QuestForm({ quest, onClose }: QuestFormProps) {
                           valueAsNumber: true,
                         })}
                         min="1"
-                        className="w-full px-2 py-1 bg-bg-tertiary border border-border rounded text-sm"
+                        className="w-full px-2 py-1 bg-bg-card-secondary border-border-subtle corner-clip-sm text-sm"
                       />
                     </div>
                   </div>
@@ -332,7 +332,7 @@ export function QuestForm({ quest, onClose }: QuestFormProps) {
                         valueAsNumber: true,
                       })}
                       min="1"
-                      className="w-full px-2 py-1 bg-bg-tertiary border border-border rounded text-sm"
+                      className="w-full px-2 py-1 bg-bg-card-secondary border-border-subtle corner-clip-sm text-sm"
                     />
                   </div>
                 </div>
@@ -341,7 +341,7 @@ export function QuestForm({ quest, onClose }: QuestFormProps) {
               <button
                 type="button"
                 onClick={() => appendMilestone({ ability: '', every: 1, gain: 1 })}
-                className="flex items-center gap-2 px-3 py-2 bg-bg-primary border border-border rounded hover:bg-bg-primary/80 transition-colors text-sm"
+                className="flex items-center gap-2 px-3 py-2 bg-bg-card-secondary border border-border-subtle corner-clip-sm hover:bg-bg-card-secondary/80 transition-colors text-sm"
               >
                 <Plus className="w-4 h-4" />
                 Add Milestone
@@ -354,7 +354,7 @@ export function QuestForm({ quest, onClose }: QuestFormProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm hover:bg-bg-tertiary/80 transition-colors"
+              className="flex-1 px-4 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm hover:bg-bg-card-secondary/80 transition-colors"
             >
               Cancel
             </button>

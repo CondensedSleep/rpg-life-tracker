@@ -761,7 +761,7 @@ export function QuickLogForm() {
                   <select
                     value={currentStatName}
                     onChange={(e) => setCurrentStatName(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-bg-primary border border-border rounded-md text-sm"
+                    className="flex-1 px-3 py-2 bg-bg-card border border-border-subtle corner-clip-sm text-sm"
                   >
                     <option value="">Select stat/ability...</option>
                     {abilities.map((ability) => (
@@ -775,7 +775,7 @@ export function QuickLogForm() {
                     value={currentStatModifier}
                     onChange={(e) => setCurrentStatModifier(e.target.value ? Number(e.target.value) : '')}
                     placeholder="+2, -1, etc."
-                    className="w-24 px-3 py-2 bg-bg-primary border border-border rounded-md text-sm"
+                    className="w-24 px-3 py-2 bg-bg-card border border-border-subtle corner-clip-sm text-sm"
                   />
                   <button
                     type="button"
@@ -797,7 +797,7 @@ export function QuickLogForm() {
                 {tempStatModifiers.length > 0 && (
                   <div className="space-y-1">
                     {tempStatModifiers.map((mod, idx) => (
-                      <div key={idx} className="flex justify-between items-center p-2 bg-bg-primary rounded border border-border text-sm">
+                      <div key={idx} className="flex justify-between items-center p-2 bg-bg-card-secondary corner-clip-sm border border-border-subtle text-sm">
                         <span>
                           {mod.modifier > 0 ? '+' : ''}{mod.modifier} <span className="uppercase">{mod.stat}</span>
                         </span>
@@ -919,7 +919,7 @@ export function QuickLogForm() {
                     setValueAs: (v) => v === '' || v === null ? null : Number(v)
                   })}
                   placeholder="+1, -2, etc."
-                  className="w-full px-3 py-2 bg-bg-primary border border-border rounded-md"
+                  className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
                 />
                 <p className="text-xs text-text-secondary mt-1">
                   Additional bonus/penalty along with {customEffectForm.watch('effect_type')}

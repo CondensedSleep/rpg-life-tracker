@@ -75,7 +75,7 @@ export function TraitsList() {
 
       {/* Traits Grid */}
       {traits.length === 0 ? (
-        <div className="p-6 bg-bg-secondary rounded-lg border border-border text-center frosted">
+        <div className="p-6 bg-bg-secondary rounded-lg border border-border text-center">
           <p className="text-text-secondary">
             No traits yet. Add your first trait to define your character's unique features and flaws.
           </p>
@@ -85,7 +85,7 @@ export function TraitsList() {
           {traits.map((trait) => (
             <div
               key={trait.id}
-              className="p-4 bg-bg-secondary rounded-lg border border-border frosted hover:bg-bg-tertiary transition-colors"
+              className="p-4 bg-bg-secondary rounded-lg border border-border hover:bg-bg-tertiary transition-colors"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 space-y-2">

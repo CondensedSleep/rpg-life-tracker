@@ -122,7 +122,7 @@ export function QuestList({ questType, title }: QuestListProps) {
 
       {/* Quests Grid */}
       {quests.length === 0 ? (
-        <div className="p-6 bg-bg-secondary rounded-lg border border-border text-center frosted">
+        <div className="p-6 bg-bg-secondary rounded-lg border border-border text-center">
           <p className="text-text-secondary">
             {questType === 'weekly'
               ? 'No weekly quests yet. Add recurring quests to complete multiple times for XP.'

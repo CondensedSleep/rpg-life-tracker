@@ -42,7 +42,7 @@ export function QuestCard({ quest, onComplete, onEdit, onDelete }: QuestCardProp
   }
 
   return (
-    <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted hover:bg-bg-tertiary transition-colors">
+    <div className="p-4 bg-bg-secondary rounded-lg border border-border hover:bg-bg-tertiary transition-colors">
       <div className="flex items-start justify-between gap-4 mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">

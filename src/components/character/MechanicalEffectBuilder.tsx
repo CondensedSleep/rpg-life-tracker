@@ -65,7 +65,7 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
             return (
               <div
                 key={field.id}
-                className="space-y-4 p-4 border border-border-subtle rounded-lg bg-bg-card-secondary frosted-sm"
+                className="space-y-4 p-4 border border-border-subtle rounded-lg bg-bg-card-secondary-sm"
               >
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium text-sm">Effect {index + 1}</h4>

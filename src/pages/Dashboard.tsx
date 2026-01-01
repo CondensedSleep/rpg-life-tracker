@@ -578,7 +578,7 @@ export function Dashboard() {
 
         {/* Column 3: Traits (6 cols = 30% width) */}
         <div className="lg:col-span-6">
-          <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted flex flex-col h-[516px]">
+          <div className="p-4 bg-bg-card corner-clip shadow-card flex flex-col h-[516px]">
             <div className="flex items-center justify-between mb-2 -mt-1">
               <h3 className="text-lg font-semibold">Traits</h3>
               <Button size="sm" onClick={() => setIsCreatingTrait(true)}>
