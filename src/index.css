@@ -1,36 +1,76 @@
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: rgba(36, 36, 36, 0.8);
-  --bg-tertiary: rgba(45, 45, 45, 0.7);
-  --text-primary: #e5e5e5;
-  --text-secondary: #a0a0a0;
-  --accent-primary: #dc2626;
-  --accent-secondary: #3b82f6;
-  --accent-success: #10b981;
-  --accent-warning: #f59e0b;
-  --border: #404040;
+  /* Backgrounds - Light Mode */
+  --bg-base: #2a2d35;
+  --bg-card: #ffffff;
+  --bg-card-secondary: #f8f9fa;
+  
+  /* Text */
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a5568;
+  --text-tertiary: #9ca3af;
+  
+  /* Accents */
+  --accent-red: #dc2626;
+  --accent-red-hover: #b91c1c;
+  --accent-green: #16a34a;
+  --accent-green-hover: #15803d;
+  --accent-amber: #f59e0b;
+  
+  /* Borders & Shadows */
+  --border-subtle: #e5e7eb;
+  --shadow-hard: 0 2px 0 rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 4px 0 rgba(0, 0, 0, 0.08);
 }
 
-/* Frosted glass effect utility classes */
-.frosted {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+/* Diagonal Corner Utilities */
+.corner-clip {
+  clip-path: polygon(
+    0 8px,
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 calc(100% - 8px)
+  );
 }
 
-.frosted-sm {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+.corner-clip-sm {
+  clip-path: polygon(
+    0 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    0 calc(100% - 4px)
+  );
 }
 
-.frosted-lg {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+.corner-clip-lg {
+  clip-path: polygon(
+    0 12px,
+    12px 0,
+    calc(100% - 12px) 0,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    0 calc(100% - 12px)
+  );
+}
+
+/* Hover effect: charcoal to black */
+.hover-darken:hover {
+  color: var(--text-primary);
 }
 
 body {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-base);
   color: var(--text-primary);
   margin: 0;
   min-height: 100vh;
