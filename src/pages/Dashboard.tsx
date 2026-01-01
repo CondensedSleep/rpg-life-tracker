@@ -343,9 +343,9 @@ export function Dashboard() {
                 </button>
               </div>
             </div>
-            <div className="w-full bg-card-secondary corner-clip-sm h-3">
+            <div className="w-full bg-card-secondary rounded h-3">
               <div
-                className={`h-3 corner-clip-sm transition-all duration-300 ${
+                className={`h-3 rounded transition-all duration-300 ${
                   isReadyToLevelUp ? 'bg-amber animate-pulse' : 'bg-green'
                 }`}
                 style={{
@@ -417,7 +417,7 @@ export function Dashboard() {
                   {Array.from({ length: hitDice.max_hit_dice }).map((_, i) => (
                     <div
                       key={i}
-                      className={`w-6 h-6 corner-clip-sm border-2 ${
+                      className={`w-6 h-6 rounded border-2 ${
                         i < hitDice.current_hit_dice
                           ? 'bg-green border-green'
                           : 'border-subtle bg-card-secondary'
@@ -591,7 +591,7 @@ export function Dashboard() {
                 <p className="text-sm text-secondary">No traits yet</p>
               ) : (
                 traits.map(trait => (
-                  <div key={trait.id} className="text-sm group hover:bg-card-secondary p-2 -mx-2 corner-clip-sm transition-colors">
+                  <div key={trait.id} className="text-sm group hover:bg-card-secondary p-2 -mx-2 rounded transition-colors">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -687,7 +687,7 @@ export function Dashboard() {
                 <p className="text-sm text-secondary">No items yet</p>
               ) : (
                 inventory.filter(item => item.is_equipped).map(item => (
-                  <div key={item.id} className="text-sm group hover:bg-card-secondary p-2 -mx-2 corner-clip-sm transition-colors">
+                  <div key={item.id} className="text-sm group hover:bg-card-secondary p-2 -mx-2 rounded transition-colors">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -902,7 +902,7 @@ export function Dashboard() {
                     <button
                       key={ability.id}
                       onClick={() => setSelectedAbilityForLevelUp(ability.ability_name)}
-                      className={`p-4 corner-clip-sm border-2 transition-all text-left ${
+                      className={`p-4 rounded border-2 transition-all text-left ${
                         selectedAbilityForLevelUp === ability.ability_name
                           ? 'border-green bg-green/10'
                           : 'border-subtle bg-card hover:border-red'
@@ -926,7 +926,7 @@ export function Dashboard() {
                 </div>
               </div>
             ) : (
-              <div className="p-6 bg-card-secondary corner-clip-sm border border-subtle text-center">
+              <div className="p-6 bg-card-secondary rounded border border-subtle text-center">
                 <p className="text-secondary">
                   No abilities are eligible for advancement yet.
                   <br />
@@ -946,7 +946,7 @@ export function Dashboard() {
                   .map(ability => (
                     <div
                       key={ability.id}
-                      className="p-3 corner-clip-sm bg-card-secondary border border-subtle opacity-60"
+                      className="p-3 rounded bg-card-secondary border border-subtle opacity-60"
                     >
                       <div className="font-semibold uppercase text-sm">{ability.ability_name}</div>
                       <div className="text-xs text-secondary">

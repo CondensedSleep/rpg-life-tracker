@@ -63,7 +63,7 @@ export function ActiveEffects() {
           return (
             <div
               key={effect.id}
-              className="p-3 bg-card-secondary corner-clip-sm border border-subtle flex items-start justify-between gap-3"
+              className="p-3 bg-card-secondary rounded border border-subtle flex items-start justify-between gap-3"
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export function ActiveEffects() {
                         {effect.stat_modifiers.map((mod, idx) => (
                           <span
                             key={idx}
-                            className="text-xs px-2 py-1 bg-card corner-clip-sm border border-subtle uppercase"
+                            className="text-xs px-2 py-1 bg-card rounded border border-subtle uppercase"
                           >
                             {mod.modifier >= 0 ? '+' : ''}{mod.modifier} {mod.stat}
                           </span>
@@ -140,7 +140,7 @@ export function ActiveEffects() {
 
               <button
                 onClick={() => handleRemoveEffect(effect.id, effect.effect_name)}
-                className="px-3 py-1 text-sm bg-red/10 text-red border border-red/30 corner-clip-sm hover:bg-red/20 transition-colors"
+                className="px-3 py-1 text-sm bg-red/10 text-red border border-red/30 rounded hover:bg-red/20 transition-colors"
               >
                 Remove
               </button>

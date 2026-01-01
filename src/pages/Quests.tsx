@@ -51,7 +51,7 @@ export function Quests() {
             setEditingQuest(null)
             setShowQuestForm(true)
           }}
-          className="flex items-center gap-2 px-4 py-2 bg-red text-white corner-clip-sm hover:bg-red/90 shadow-hard active:shadow-none active:translate-y-0.5 transition-all"
+          className="flex items-center gap-2 px-4 py-2 bg-red text-white rounded hover:bg-red/90 shadow-hard active:shadow-none active:translate-y-0.5 transition-all"
         >
           <Plus className="w-5 h-5" />
           Create Quest
@@ -265,7 +265,7 @@ const QuestCard = memo(function QuestCard({ quest, onEdit, onDelete }: { quest: 
 
   return (
     <div
-      className={`p-4 corner-clip-sm border transition-all ${
+      className={`p-4 rounded border transition-all ${
         isCompleted
           ? 'bg-card-secondary/50 border-subtle/50 opacity-60'
           : 'bg-card-secondary border-subtle hover:border-red/50'
@@ -278,7 +278,7 @@ const QuestCard = memo(function QuestCard({ quest, onEdit, onDelete }: { quest: 
           onClick={handleToggle}
         >
           {isRecurring ? (
-            <div className="flex items-center justify-center w-6 h-6 corner-clip-sm border-2 border-red bg-card text-xs font-bold text-red">
+            <div className="flex items-center justify-center w-6 h-6 rounded border-2 border-red bg-card text-xs font-bold text-red">
               {quest.times_completed}
             </div>
           ) : isCompleted ? (
@@ -298,12 +298,12 @@ const QuestCard = memo(function QuestCard({ quest, onEdit, onDelete }: { quest: 
               {quest.core_stat.map((stat) => (
                 <span
                   key={stat}
-                  className="text-xs px-2 py-0.5 corner-clip-sm bg-red/10 text-red uppercase"
+                  className="text-xs px-2 py-0.5 rounded bg-red/10 text-red uppercase"
                 >
                   {stat}
                 </span>
               ))}
-              <span className="text-xs px-2 py-0.5 corner-clip-sm bg-green/10 text-green">
+              <span className="text-xs px-2 py-0.5 rounded bg-green/10 text-green">
                 {quest.xp_reward} XP
               </span>
             </div>

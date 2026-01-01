@@ -76,7 +76,7 @@ export function Auth() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm focus:outline-none focus:border-red focus:border-2"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle rounded focus:outline-none focus:border-red focus:border-2"
               placeholder="you@example.com"
             />
           </div>
@@ -92,7 +92,7 @@ export function Auth() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm focus:outline-none focus:border-red focus:border-2"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle rounded focus:outline-none focus:border-red focus:border-2"
               placeholder="••••••••"
             />
           </div>
@@ -100,7 +100,7 @@ export function Auth() {
           {error && (
             <div className={`p-3 rounded ${
               error.includes('Check your email')
-                ? 'bg-green/10 text-green border border-green/20 corner-clip-sm'
+                ? 'bg-green/10 text-green border border-green/20 rounded'
                 : 'bg-accent-primary/10 text-accent-primary border border-accent-primary/20'
             }`}>
               {error}

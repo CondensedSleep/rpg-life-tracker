@@ -36,7 +36,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                   to={item.to}
                   className={`
                     flex flex-col items-center justify-center py-3 px-2
-                    transition-all duration-200 corner-clip-sm
+                    transition-all duration-200 rounded
                     ${
                       isActive
                         ? 'text-red bg-red/10'

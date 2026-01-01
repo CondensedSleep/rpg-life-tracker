@@ -273,7 +273,7 @@ export function Journal() {
                     ? 'Select abilities with disadvantage (multiple allowed)' 
                     : 'Select ONE ability with advantage'}
                 </Label>
-                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto p-2 bg-card-secondary corner-clip-sm">
+                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto p-2 bg-card-secondary rounded">
                   {abilities.map(ability => (
                     <div key={ability.id} className="flex items-center space-x-2">
                       <Checkbox
@@ -340,7 +340,7 @@ export function Journal() {
             {actionLog.map((action) => (
               <div
                 key={action.id}
-                className="p-3 bg-card-secondary corner-clip-sm border border-subtle"
+                className="p-3 bg-card-secondary rounded border border-subtle"
               >
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <div className="flex items-center gap-2">

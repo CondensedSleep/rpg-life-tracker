@@ -77,7 +77,7 @@ const TreeNodeDisplay = memo(function TreeNodeDisplay({ node, depth, quests, onT
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-0.5 hover:bg-card-secondary corner-clip-sm"
+            className="p-0.5 hover:bg-card-secondary rounded"
           >
             {isExpanded ? (
               <ChevronDown className="w-4 h-4 text-secondary" />
@@ -119,7 +119,7 @@ const TreeNodeDisplay = memo(function TreeNodeDisplay({ node, depth, quests, onT
         {/* Node Content */}
         <div className="flex items-center gap-2 flex-1">
           {node.type === 'quest' && (
-            <span className="px-1.5 py-0.5 text-xs font-semibold bg-red/10 text-red corner-clip-sm">
+            <span className="px-1.5 py-0.5 text-xs font-semibold bg-red/10 text-red rounded">
               Quest
             </span>
           )}
