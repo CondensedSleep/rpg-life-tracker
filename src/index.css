@@ -1,27 +1,25 @@
 @import "tailwindcss";
 
-:root {
-  /* Backgrounds - Light Mode */
-  --bg-base: #2a2d35;
-  --bg-card: #ffffff;
-  --bg-card-secondary: #f8f9fa;
+@theme {
+  --color-base: #2a2d35;
+  --color-card: #ffffff;
+  --color-card-secondary: #f8f9fa;
   
-  /* Text */
-  --text-primary: #1a1a1a;
-  --text-secondary: #4a5568;
-  --text-tertiary: #9ca3af;
+  --color-primary: #1a1a1a;
+  --color-secondary: #4a5568;
+  --color-tertiary: #9ca3af;
   
-  /* Accents */
-  --accent-red: #dc2626;
-  --accent-red-hover: #b91c1c;
-  --accent-green: #16a34a;
-  --accent-green-hover: #15803d;
-  --accent-amber: #f59e0b;
+  --color-red: #dc2626;
+  --color-red-hover: #b91c1c;
+  --color-green: #16a34a;
+  --color-green-hover: #15803d;
+  --color-amber: #f59e0b;
   
-  /* Borders & Shadows */
-  --border-subtle: #e5e7eb;
+  --color-subtle: #e5e7eb;
+  
   --shadow-hard: 0 2px 0 rgba(0, 0, 0, 0.1);
   --shadow-card: 0 4px 0 rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 6px 0 rgba(0, 0, 0, 0.12);
 }
 
 /* Diagonal Corner Utilities */
