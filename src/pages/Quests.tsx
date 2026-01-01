@@ -45,7 +45,7 @@ export function Quests() {
     <div className="container mx-auto p-4 max-w-7xl">
       {/* Header with Create Quest button */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-4xl font-bold">Quests</h1>
+        <h1 className="text-4xl font-bold text-white">Quests</h1>
         <button
           onClick={() => {
             setEditingQuest(null)
