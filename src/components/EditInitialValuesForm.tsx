@@ -118,7 +118,7 @@ export function EditInitialValuesForm({
 
             <div className="flex gap-2 justify-end">
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={onCancel}
                 disabled={loading}
               >
