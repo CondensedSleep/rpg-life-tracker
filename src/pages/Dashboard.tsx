@@ -303,7 +303,7 @@ export function Dashboard() {
           ================================================================ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left: Character Info + XP */}
-        <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+        <div className="p-6 bg-bg-card corner-clip shadow-card">
           <div className="flex items-center justify-between mb-1">
             <h1 className="text-3xl font-bold">{character.name}</h1>
             <Button
@@ -343,10 +343,10 @@ export function Dashboard() {
                 </button>
               </div>
             </div>
-            <div className="w-full bg-bg-tertiary rounded-full h-3">
+            <div className="w-full bg-bg-card-secondary corner-clip-sm h-3">
               <div
-                className={`h-3 rounded-full transition-all duration-300 ${
-                  isReadyToLevelUp ? 'bg-accent-warning animate-pulse' : 'bg-accent-primary'
+                className={`h-3 corner-clip-sm transition-all duration-300 ${
+                  isReadyToLevelUp ? 'bg-accent-amber animate-pulse' : 'bg-accent-green'
                 }`}
                 style={{
                   width: `${Math.min((character.current_xp / character.xp_to_next_level) * 100, 100)}%`,
@@ -357,7 +357,7 @@ export function Dashboard() {
         </div>
 
         {/* Right: Day State */}
-        <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+        <div className="p-6 bg-bg-card corner-clip shadow-card">
           <h2 className="text-lg font-semibold mb-3">Today's State</h2>
           
           {todayRoll && currentDayInfo ? (
@@ -392,7 +392,7 @@ export function Dashboard() {
         </div>
 
         {/* Third: Hit Dice & Rest */}
-        <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+        <div className="p-6 bg-bg-card corner-clip shadow-card">
           <h2 className="text-lg font-semibold mb-3">Hit Dice</h2>
 
           {hitDice ? (
@@ -403,10 +403,10 @@ export function Dashboard() {
                   <span className="text-sm text-text-secondary">Current / Max</span>
                   <span className={`text-2xl font-bold ${
                     hitDice.current_hit_dice === 0
-                      ? 'text-accent-primary'
+                      ? 'text-accent-red'
                       : hitDice.current_hit_dice <= hitDice.max_hit_dice / 3
-                        ? 'text-accent-warning'
-                        : 'text-accent-success'
+                        ? 'text-accent-amber'
+                        : 'text-accent-green'
                   }`}>
                     {hitDice.current_hit_dice} / {hitDice.max_hit_dice}
                   </span>
@@ -417,10 +417,10 @@ export function Dashboard() {
                   {Array.from({ length: hitDice.max_hit_dice }).map((_, i) => (
                     <div
                       key={i}
-                      className={`w-6 h-6 rounded border-2 ${
+                      className={`w-6 h-6 corner-clip-sm border-2 ${
                         i < hitDice.current_hit_dice
-                          ? 'bg-accent-success border-accent-success'
-                          : 'border-border bg-bg-tertiary'
+                          ? 'bg-accent-green border-accent-green'
+                          : 'border-border-subtle bg-bg-card-secondary'
                       }`}
                     />
                   ))}
@@ -484,14 +484,14 @@ export function Dashboard() {
               return (
                 <div
                   key={statName}
-                  className="p-4 bg-bg-secondary rounded-lg border border-border frosted text-center flex flex-col justify-center"
+                  className="p-4 bg-bg-card corner-clip shadow-hard text-center flex flex-col justify-center"
                   style={{ height: '120px' }}
                 >
                   <div className="text-sm uppercase font-bold text-text-secondary mb-1">
                     {statName}
                   </div>
                   <div 
-                    className="text-5xl font-bold text-accent-secondary cursor-pointer hover:opacity-80 transition-opacity"
+                    className="text-5xl font-bold text-accent-red cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => {
                       setEditingItem(stat)
                       setEditingItemType('stat')
@@ -513,7 +513,7 @@ export function Dashboard() {
             {abilitiesByCoreStat.map(({ stat, abilities: statAbilities }) => (
               <div
                 key={stat}
-                className="p-4 bg-bg-secondary rounded-lg border border-border frosted flex items-center"
+                className="p-4 bg-bg-card corner-clip shadow-hard flex items-center"
                 style={{ height: '120px' }}
               >
                 <div className="w-full space-y-1">
@@ -543,7 +543,7 @@ export function Dashboard() {
                           {ability.ability_name}
                         </span>
                         <span
-                          className="font-semibold text-accent-secondary cursor-pointer hover:opacity-80 transition-opacity"
+                          className="font-semibold text-accent-red cursor-pointer hover:opacity-80 transition-opacity"
                           onClick={() => {
                             setEditingItem(ability)
                             setEditingItemType('ability')
@@ -552,17 +552,17 @@ export function Dashboard() {
                         >
                           {displayValue >= 0 ? '+' : ''}{displayValue}
                           {hasModifiers && (
-                            <span className="text-accent-warning ml-1" title="Modified by traits/items">
+                            <span className="text-accent-amber ml-1" title="Modified by traits/items">
                               *
                             </span>
                           )}
                           {modifierCalc.hasAdvantage && (
-                            <span className="text-accent-success ml-1" title="Has advantage">
+                            <span className="text-accent-green ml-1" title="Has advantage">
                               ↑
                             </span>
                           )}
                           {modifierCalc.hasDisadvantage && (
-                            <span className="text-accent-primary ml-1" title="Has disadvantage">
+                            <span className="text-accent-red ml-1" title="Has disadvantage">
                               ↓
                             </span>
                           )}
@@ -591,13 +591,13 @@ export function Dashboard() {
                 <p className="text-sm text-text-secondary">No traits yet</p>
               ) : (
                 traits.map(trait => (
-                  <div key={trait.id} className="text-sm group hover:bg-bg-tertiary/50 p-2 -mx-2 rounded transition-colors">
+                  <div key={trait.id} className="text-sm group hover:bg-bg-card-secondary p-2 -mx-2 corner-clip-sm transition-colors">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold uppercase">{trait.trait_name}</span>
                           <span className="text-xs text-text-secondary capitalize">({trait.trait_type})</span>
-                          <span className={`text-xs ${trait.is_active ? 'text-accent-success' : 'text-text-secondary'}`}>
+                          <span className={`text-xs ${trait.is_active ? 'text-accent-green' : 'text-text-secondary'}`}>
                             {trait.is_active ? '●' : '○'}
                           </span>
                         </div>
@@ -605,7 +605,7 @@ export function Dashboard() {
                           <p className="text-xs text-text-secondary mt-0.5">{trait.description}</p>
                         )}
                         {trait.mechanical_effect && trait.mechanical_effect.length > 0 && (
-                          <div className="text-xs text-accent-secondary mt-1">
+                          <div className="text-xs text-accent-red mt-1">
                             {trait.mechanical_effect.map((effect, idx) => (
                               <div key={idx}>
                                 {effect.type === 'stat_modifier' && effect.stat_modifiers && (
@@ -674,7 +674,7 @@ export function Dashboard() {
 
         {/* Column 4: Inventory (6 cols = 30% width) */}
         <div className="lg:col-span-6">
-          <div className="p-4 bg-bg-secondary rounded-lg border border-border frosted flex flex-col h-[516px]">
+          <div className="p-4 bg-bg-card corner-clip shadow-card flex flex-col h-[516px]">
             <div className="flex items-center justify-between mb-2 -mt-1">
               <h3 className="text-lg font-semibold">Inventory</h3>
               <Button size="sm" onClick={() => setIsCreatingInventory(true)}>
@@ -687,7 +687,7 @@ export function Dashboard() {
                 <p className="text-sm text-text-secondary">No items yet</p>
               ) : (
                 inventory.filter(item => item.is_equipped).map(item => (
-                  <div key={item.id} className="text-sm group hover:bg-bg-tertiary/50 p-2 -mx-2 rounded transition-colors">
+                  <div key={item.id} className="text-sm group hover:bg-bg-card-secondary p-2 -mx-2 corner-clip-sm transition-colors">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -704,7 +704,7 @@ export function Dashboard() {
                           <p className="text-xs text-text-secondary mt-0.5">{item.description}</p>
                         )}
                         {item.passive_effect && item.passive_effect.length > 0 && (
-                          <div className="text-xs text-accent-secondary mt-1">
+                          <div className="text-xs text-accent-red mt-1">
                             {item.passive_effect.map((effect, idx) => (
                               <div key={idx}>
                                 {effect.type === 'stat_modifier' && effect.stat_modifiers && (
@@ -884,7 +884,7 @@ export function Dashboard() {
           <div className="space-y-6">
             <div className="text-center">
               <p className="text-lg mb-2">
-                Congratulations! You've reached <span className="font-bold text-accent-warning">Level {character?.level ? character.level + 1 : 1}</span>
+                Congratulations! You've reached <span className="font-bold text-accent-amber">Level {character?.level ? character.level + 1 : 1}</span>
               </p>
               <p className="text-sm text-text-secondary">
                 Choose an ability to increase by +1
@@ -902,10 +902,10 @@ export function Dashboard() {
                     <button
                       key={ability.id}
                       onClick={() => setSelectedAbilityForLevelUp(ability.ability_name)}
-                      className={`p-4 rounded-lg border-2 transition-all text-left ${
+                      className={`p-4 corner-clip-sm border-2 transition-all text-left ${
                         selectedAbilityForLevelUp === ability.ability_name
-                          ? 'border-accent-success bg-accent-success/10'
-                          : 'border-border bg-bg-secondary hover:border-accent-secondary'
+                          ? 'border-accent-green bg-accent-green/10'
+                          : 'border-border-subtle bg-bg-card hover:border-accent-red'
                       }`}
                     >
                       <div className="flex justify-between items-center">
@@ -916,7 +916,7 @@ export function Dashboard() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-accent-secondary">
+                          <div className="text-2xl font-bold text-accent-red">
                             {ability.base_value} → {ability.base_value + 1}
                           </div>
                         </div>
@@ -926,7 +926,7 @@ export function Dashboard() {
                 </div>
               </div>
             ) : (
-              <div className="p-6 bg-bg-tertiary rounded-lg border border-border text-center">
+              <div className="p-6 bg-bg-card-secondary corner-clip-sm border border-border-subtle text-center">
                 <p className="text-text-secondary">
                   No abilities are eligible for advancement yet.
                   <br />
@@ -946,7 +946,7 @@ export function Dashboard() {
                   .map(ability => (
                     <div
                       key={ability.id}
-                      className="p-3 rounded-lg bg-bg-tertiary border border-border opacity-60"
+                      className="p-3 corner-clip-sm bg-bg-card-secondary border border-border-subtle opacity-60"
                     >
                       <div className="font-semibold uppercase text-sm">{ability.ability_name}</div>
                       <div className="text-xs text-text-secondary">
@@ -968,7 +968,7 @@ export function Dashboard() {
               <Button
                 onClick={handleLevelUp}
                 disabled={!selectedAbilityForLevelUp || isLevelingUp}
-                className="bg-accent-success hover:bg-accent-success/80"
+                className="bg-accent-green hover:bg-accent-green/80"
               >
                 {isLevelingUp ? 'Leveling Up...' : 'Confirm Level Up'}
               </Button>

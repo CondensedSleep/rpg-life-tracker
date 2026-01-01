@@ -42,7 +42,7 @@ export function ActiveEffects() {
 
   if (!customEffects || customEffects.length === 0) {
     return (
-      <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+      <div className="p-6 bg-bg-card corner-clip shadow-card">
         <h2 className="text-lg font-semibold mb-3">Active Effects</h2>
         <p className="text-sm text-text-secondary">No active effects</p>
       </div>
@@ -50,7 +50,7 @@ export function ActiveEffects() {
   }
 
   return (
-    <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+    <div className="p-6 bg-bg-card corner-clip shadow-card">
       <h2 className="text-lg font-semibold mb-3">Active Effects</h2>
       <div className="space-y-2">
         {customEffects.map((effect) => {
@@ -63,7 +63,7 @@ export function ActiveEffects() {
           return (
             <div
               key={effect.id}
-              className="p-3 bg-bg-tertiary rounded-md border border-border flex items-start justify-between gap-3"
+              className="p-3 bg-bg-card-secondary corner-clip-sm border border-border-subtle flex items-start justify-between gap-3"
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export function ActiveEffects() {
                         {effect.stat_modifiers.map((mod, idx) => (
                           <span
                             key={idx}
-                            className="text-xs px-2 py-1 bg-bg-primary rounded border border-border uppercase"
+                            className="text-xs px-2 py-1 bg-bg-card corner-clip-sm border border-border-subtle uppercase"
                           >
                             {mod.modifier >= 0 ? '+' : ''}{mod.modifier} {mod.stat}
                           </span>
@@ -118,7 +118,7 @@ export function ActiveEffects() {
                   effect.affected_stats &&
                   effect.affected_stats.length > 0 && (
                     <div className="mt-2">
-                      <p className="text-sm text-accent-secondary">
+                      <p className="text-sm text-accent-red">
                         {effect.effect_type === 'advantage' ? 'Advantage' : 'Disadvantage'}
                         {effect.modifier ? ` (${effect.modifier > 0 ? '+' : ''}${effect.modifier})` : ''} on{' '}
                         <span className="uppercase">
@@ -140,7 +140,7 @@ export function ActiveEffects() {
 
               <button
                 onClick={() => handleRemoveEffect(effect.id, effect.effect_name)}
-                className="px-3 py-1 text-sm bg-red-500/20 text-red-400 border border-red-500/30 rounded hover:bg-red-500/30 transition-colors"
+                className="px-3 py-1 text-sm bg-accent-red/10 text-accent-red border border-accent-red/30 corner-clip-sm hover:bg-accent-red/20 transition-colors"
               >
                 Remove
               </button>
