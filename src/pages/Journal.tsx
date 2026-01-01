@@ -178,7 +178,7 @@ export function Journal() {
   return (
     <div className="container mx-auto p-4 max-w-5xl space-y-6">
       {/* Date Navigation */}
-      <div className="flex items-center justify-between p-4 bg-bg-secondary rounded-lg border border-border frosted">
+      <div className="flex items-center justify-between p-4 bg-bg-card corner-clip shadow-card">
         <Button onClick={handlePreviousDay} variant="outline">
           ← Previous Day
         </Button>
@@ -208,7 +208,7 @@ export function Journal() {
       </div>
 
       {/* Daily Roll Section */}
-      <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+      <div className="p-6 bg-bg-card corner-clip shadow-card">
         <h2 className="text-xl font-semibold mb-4">Daily Roll</h2>
 
         {dailyRoll ? (
@@ -273,7 +273,7 @@ export function Journal() {
                     ? 'Select abilities with disadvantage (multiple allowed)' 
                     : 'Select ONE ability with advantage'}
                 </Label>
-                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto p-2 bg-bg-tertiary rounded">
+                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto p-2 bg-bg-card-secondary corner-clip-sm">
                   {abilities.map(ability => (
                     <div key={ability.id} className="flex items-center space-x-2">
                       <Checkbox
@@ -304,7 +304,7 @@ export function Journal() {
       </div>
 
       {/* Journal Text Editor */}
-      <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+      <div className="p-6 bg-bg-card corner-clip shadow-card">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Journal Entry</h2>
           <Button 
@@ -330,7 +330,7 @@ export function Journal() {
       </div>
 
       {/* Action Log */}
-      <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+      <div className="p-6 bg-bg-card corner-clip shadow-card">
         <h2 className="text-xl font-semibold mb-4">Action Log</h2>
 
         {actionLog.length === 0 ? (
@@ -340,7 +340,7 @@ export function Journal() {
             {actionLog.map((action) => (
               <div
                 key={action.id}
-                className="p-3 bg-bg-tertiary rounded border border-border"
+                className="p-3 bg-bg-card-secondary corner-clip-sm border border-border-subtle"
               >
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <div className="flex items-center gap-2">

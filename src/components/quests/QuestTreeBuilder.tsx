@@ -45,7 +45,7 @@ export function QuestTreeBuilder({ tree, onChange, availableQuests }: QuestTreeB
               },
             ])
           }}
-          className="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-2"
+          className="px-3 py-2 text-sm bg-blue-600 text-white corner-clip-sm hover:bg-blue-700 flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Add Text Node
@@ -65,7 +65,7 @@ export function QuestTreeBuilder({ tree, onChange, availableQuests }: QuestTreeB
               },
             ])
           }}
-          className="px-3 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 flex items-center gap-2"
+          className="px-3 py-2 text-sm bg-purple-600 text-white corner-clip-sm hover:bg-purple-700 flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Add Quest Reference
@@ -117,7 +117,7 @@ function TreeNode({ node, depth, availableQuests, onUpdate, onDelete }: TreeNode
           <div className="flex items-start gap-2">
             {/* Type Badge */}
             <span
-              className={`mt-2 px-2 py-1 text-xs font-semibold rounded ${
+              className={`mt-2 px-2 py-1 text-xs font-semibold corner-clip-sm ${
                 node.type === 'text'
                   ? 'bg-blue-100 text-blue-700'
                   : 'bg-purple-100 text-purple-700'
@@ -135,7 +135,7 @@ function TreeNode({ node, depth, availableQuests, onUpdate, onDelete }: TreeNode
                   onUpdate({ ...node, text: e.target.value })
                 }}
                 placeholder="Enter text node content..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 corner-clip-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             ) : (
               <select
@@ -143,7 +143,7 @@ function TreeNode({ node, depth, availableQuests, onUpdate, onDelete }: TreeNode
                 onChange={(e) => {
                   onUpdate({ ...node, text: e.target.value })
                 }}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 corner-clip-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select a quest...</option>
                 {availableQuests.map((quest) => (
@@ -158,7 +158,7 @@ function TreeNode({ node, depth, availableQuests, onUpdate, onDelete }: TreeNode
             <button
               type="button"
               onClick={onDelete}
-              className="mt-1 p-2 text-red-600 hover:bg-red-50 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+              className="mt-1 p-2 text-red-600 hover:bg-red-50 corner-clip-sm opacity-0 group-hover:opacity-100 transition-opacity"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -181,7 +181,7 @@ function TreeNode({ node, depth, availableQuests, onUpdate, onDelete }: TreeNode
                   children: [...(node.children || []), newChild],
                 })
               }}
-              className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded hover:bg-blue-100 flex items-center gap-1"
+              className="px-2 py-1 text-xs bg-blue-50 text-blue-700 corner-clip-sm hover:bg-blue-100 flex items-center gap-1"
             >
               <Plus className="w-3 h-3" />
               Add Child Text
@@ -202,7 +202,7 @@ function TreeNode({ node, depth, availableQuests, onUpdate, onDelete }: TreeNode
                   children: [...(node.children || []), newChild],
                 })
               }}
-              className="px-2 py-1 text-xs bg-purple-50 text-purple-700 rounded hover:bg-purple-100 flex items-center gap-1"
+              className="px-2 py-1 text-xs bg-purple-50 text-purple-700 corner-clip-sm hover:bg-purple-100 flex items-center gap-1"
             >
               <Plus className="w-3 h-3" />
               Add Child Quest

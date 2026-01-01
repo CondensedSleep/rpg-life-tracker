@@ -51,7 +51,7 @@ export function Quests() {
             setEditingQuest(null)
             setShowQuestForm(true)
           }}
-          className="flex items-center gap-2 px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-accent-primary/90 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-accent-red text-white corner-clip-sm hover:bg-accent-red/90 shadow-hard active:shadow-none active:translate-y-0.5 transition-all"
         >
           <Plus className="w-5 h-5" />
           Create Quest
@@ -61,7 +61,7 @@ export function Quests() {
       {/* Two-column top section: Side Quests | Recurring Quests */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         {/* Side Quests */}
-        <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+        <div className="p-6 bg-bg-card corner-clip shadow-card">
           <h2 className="text-2xl font-bold mb-4">Side Quests</h2>
           <div className="space-y-2">
             {sideQuests.length === 0 ? (
@@ -83,7 +83,7 @@ export function Quests() {
         </div>
 
         {/* Recurring Quests */}
-        <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+        <div className="p-6 bg-bg-card corner-clip shadow-card">
           <h2 className="text-2xl font-bold mb-4">Recurring Quests</h2>
           <div className="space-y-2">
             {recurringQuests.length === 0 ? (
@@ -106,7 +106,7 @@ export function Quests() {
       </div>
 
       {/* Full-width bottom section: Main Quests */}
-      <div className="p-6 bg-bg-secondary rounded-lg border border-border frosted">
+      <div className="p-6 bg-bg-card corner-clip shadow-card">
         <h2 className="text-2xl font-bold mb-4">Main Quests</h2>
         <div className="space-y-3">
           {mainQuests.length === 0 ? (
@@ -265,10 +265,10 @@ const QuestCard = memo(function QuestCard({ quest, onEdit, onDelete }: { quest: 
 
   return (
     <div
-      className={`p-4 rounded-md border transition-all ${
+      className={`p-4 corner-clip-sm border transition-all ${
         isCompleted
-          ? 'bg-bg-tertiary/50 border-border/50 opacity-60'
-          : 'bg-bg-tertiary border-border hover:border-accent-primary/50'
+          ? 'bg-bg-card-secondary/50 border-border-subtle/50 opacity-60'
+          : 'bg-bg-card-secondary border-border-subtle hover:border-accent-red/50'
       }`}
     >
       <div className="flex items-start gap-3">
@@ -278,13 +278,13 @@ const QuestCard = memo(function QuestCard({ quest, onEdit, onDelete }: { quest: 
           onClick={handleToggle}
         >
           {isRecurring ? (
-            <div className="flex items-center justify-center w-6 h-6 rounded border-2 border-accent-primary bg-bg-primary text-xs font-bold text-accent-primary">
+            <div className="flex items-center justify-center w-6 h-6 corner-clip-sm border-2 border-accent-red bg-bg-card text-xs font-bold text-accent-red">
               {quest.times_completed}
             </div>
           ) : isCompleted ? (
-            <CheckSquare className="w-6 h-6 text-accent-primary" />
+            <CheckSquare className="w-6 h-6 text-accent-red" />
           ) : (
-            <Square className="w-6 h-6 text-text-secondary hover:text-accent-primary transition-colors" />
+            <Square className="w-6 h-6 text-text-secondary hover:text-accent-red transition-colors" />
           )}
         </button>
 
@@ -298,25 +298,25 @@ const QuestCard = memo(function QuestCard({ quest, onEdit, onDelete }: { quest: 
               {quest.core_stat.map((stat) => (
                 <span
                   key={stat}
-                  className="text-xs px-2 py-0.5 rounded bg-accent-secondary/20 text-accent-secondary uppercase"
+                  className="text-xs px-2 py-0.5 corner-clip-sm bg-accent-red/10 text-accent-red uppercase"
                 >
                   {stat}
                 </span>
               ))}
-              <span className="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">
+              <span className="text-xs px-2 py-0.5 corner-clip-sm bg-accent-green/10 text-accent-green">
                 {quest.xp_reward} XP
               </span>
             </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={onEdit}
-                className="text-xs px-2 py-1 text-text-secondary hover:text-accent-primary transition-colors"
+                className="text-xs px-2 py-1 text-text-secondary hover:text-accent-red transition-colors"
               >
                 Edit
               </button>
               <button
                 onClick={onDelete}
-                className="p-1 text-text-secondary hover:text-red-500 transition-colors"
+                className="p-1 text-text-secondary hover:text-accent-red transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
               </button>

@@ -14,7 +14,7 @@ export function QuestTreeDisplay({ tree, quests, onToggleNode }: QuestTreeDispla
   }
 
   return (
-    <div className="mt-4 pt-4 border-t border-border space-y-1">
+    <div className="mt-4 pt-4 border-t border-border-subtle space-y-1">
       {tree.map((node) => (
         <TreeNodeDisplay
           key={node.id}
@@ -77,7 +77,7 @@ const TreeNodeDisplay = memo(function TreeNodeDisplay({ node, depth, quests, onT
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-0.5 hover:bg-bg-tertiary rounded"
+            className="p-0.5 hover:bg-bg-card-secondary corner-clip-sm"
           >
             {isExpanded ? (
               <ChevronDown className="w-4 h-4 text-text-secondary" />
@@ -110,7 +110,7 @@ const TreeNodeDisplay = memo(function TreeNodeDisplay({ node, depth, quests, onT
               </span>
             </div>
           ) : isCompleted ? (
-            <CheckCircle2 className="w-4 h-4 text-green-500" />
+            <CheckCircle2 className="w-4 h-4 text-accent-green" />
           ) : (
             <Circle className="w-4 h-4 text-text-secondary" />
           )}
@@ -119,7 +119,7 @@ const TreeNodeDisplay = memo(function TreeNodeDisplay({ node, depth, quests, onT
         {/* Node Content */}
         <div className="flex items-center gap-2 flex-1">
           {node.type === 'quest' && (
-            <span className="px-1.5 py-0.5 text-xs font-semibold bg-purple-100 text-purple-700 rounded">
+            <span className="px-1.5 py-0.5 text-xs font-semibold bg-accent-red/10 text-accent-red corner-clip-sm">
               Quest
             </span>
           )}

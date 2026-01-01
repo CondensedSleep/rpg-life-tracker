@@ -51,7 +51,7 @@ export function PassiveEffectBuilder({ form }: PassiveEffectBuilderProps) {
       </div>
 
       {fields.length === 0 ? (
-        <p className="text-sm text-text-secondary p-4 border border-border rounded-lg bg-bg-tertiary">
+        <p className="text-sm text-text-secondary p-4 border border-border-subtle rounded-lg bg-bg-card-secondary">
           No effects added. Click "Add Effect" to add passive effects to this item.
         </p>
       ) : (
@@ -65,7 +65,7 @@ export function PassiveEffectBuilder({ form }: PassiveEffectBuilderProps) {
             return (
               <div
                 key={field.id}
-                className="space-y-4 p-4 border border-border rounded-lg bg-bg-tertiary frosted-sm"
+                className="space-y-4 p-4 border border-border-subtle rounded-lg bg-bg-card-secondary frosted-sm"
               >
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium text-sm">Effect {index + 1}</h4>
