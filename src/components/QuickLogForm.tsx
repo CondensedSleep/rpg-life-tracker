@@ -300,17 +300,17 @@ export function QuickLogForm() {
   }
 
   return (
-    <div className="p-6 bg-bg-card corner-clip shadow-card">
+    <div className="p-6 bg-card corner-clip shadow-card">
       <h2 className="text-xl font-bold mb-4">Quick Log</h2>
 
       {/* Tab buttons */}
-      <div className="flex gap-2 mb-6 border-b border-border-subtle">
+      <div className="flex gap-2 mb-6 border-b border-subtle">
         <button
           onClick={() => setActiveTab('ability_check')}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === 'ability_check'
-              ? 'border-b-2 border-accent-red text-accent-red'
-              : 'text-text-secondary hover:text-text-primary'
+              ? 'border-b-2 border-red text-red'
+              : 'text-secondary hover:text-primary'
           }`}
         >
           Ability Check
@@ -319,8 +319,8 @@ export function QuickLogForm() {
           onClick={() => setActiveTab('saving_throw')}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === 'saving_throw'
-              ? 'border-b-2 border-accent-red text-accent-red'
-              : 'text-text-secondary hover:text-text-primary'
+              ? 'border-b-2 border-red text-red'
+              : 'text-secondary hover:text-primary'
           }`}
         >
           Saving Throw
@@ -329,8 +329,8 @@ export function QuickLogForm() {
           onClick={() => setActiveTab('custom_effect')}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === 'custom_effect'
-              ? 'border-b-2 border-accent-red text-accent-red'
-              : 'text-text-secondary hover:text-text-primary'
+              ? 'border-b-2 border-red text-red'
+              : 'text-secondary hover:text-primary'
           }`}
         >
           Custom Effect
@@ -366,7 +366,7 @@ export function QuickLogForm() {
                 abilityCheckForm.setValue('had_advantage', autoFill.hasAdvantage)
                 abilityCheckForm.setValue('had_disadvantage', autoFill.hasDisadvantage)
               }}
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
             >
               <option value="">None</option>
               {abilities.map((ability) => (
@@ -389,7 +389,7 @@ export function QuickLogForm() {
                 {...abilityCheckForm.register('roll_value', {
                   valueAsNumber: true,
                 })}
-                className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+                className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
               />
               {abilityCheckForm.formState.errors.roll_value && (
                 <p className="text-red-500 text-sm mt-1">
@@ -407,7 +407,7 @@ export function QuickLogForm() {
                 min="1"
                 max="30"
                 {...abilityCheckForm.register('dc', { valueAsNumber: true })}
-                className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+                className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
               />
             </div>
           </div>
@@ -422,17 +422,17 @@ export function QuickLogForm() {
                 <input
                   type="checkbox"
                   {...abilityCheckForm.register('had_advantage')}
-                  className="w-4 h-4 border-border-subtle bg-bg-card-secondary text-accent-red corner-clip-sm"
+                  className="w-4 h-4 border-subtle bg-card-secondary text-red corner-clip-sm"
                 />
-                <span className="text-sm text-accent-green">Advantage</span>
+                <span className="text-sm text-green">Advantage</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   {...abilityCheckForm.register('had_disadvantage')}
-                  className="w-4 h-4 border-border-subtle bg-bg-card-secondary text-accent-red corner-clip-sm"
+                  className="w-4 h-4 border-subtle bg-card-secondary text-red corner-clip-sm"
                 />
-                <span className="text-sm text-accent-red">Disadvantage</span>
+                <span className="text-sm text-red">Disadvantage</span>
               </label>
             </div>
           </div>
@@ -448,9 +448,9 @@ export function QuickLogForm() {
               {...abilityCheckForm.register('additional_modifier', {
                 valueAsNumber: true,
               })}
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
             />
-            <p className="text-xs text-text-secondary mt-1">
+            <p className="text-xs text-secondary mt-1">
               Extra bonus/penalty beyond ability modifiers
             </p>
           </div>
@@ -465,7 +465,7 @@ export function QuickLogForm() {
               {...abilityCheckForm.register('xp_gained', {
                 valueAsNumber: true,
               })}
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
             />
           </div>
 
@@ -476,14 +476,14 @@ export function QuickLogForm() {
             <textarea
               {...abilityCheckForm.register('description')}
               rows={2}
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
             />
           </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full px-4 py-2 bg-accent-red text-white corner-clip-sm hover:bg-accent-red/90 shadow-hard active:shadow-none active:translate-y-0.5 transition-colors disabled:opacity-50"
+            className="w-full px-4 py-2 bg-red text-white corner-clip-sm hover:bg-red/90 shadow-hard active:shadow-none active:translate-y-0.5 transition-colors disabled:opacity-50"
           >
             {isSubmitting ? 'Logging...' : 'Log Ability Check'}
           </button>
@@ -519,7 +519,7 @@ export function QuickLogForm() {
                 savingThrowForm.setValue('had_advantage', autoFill.hasAdvantage)
                 savingThrowForm.setValue('had_disadvantage', autoFill.hasDisadvantage)
               }}
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
             >
               <option value="">None</option>
               {abilities.map((ability) => (
@@ -542,7 +542,7 @@ export function QuickLogForm() {
                 {...savingThrowForm.register('roll_value', {
                   valueAsNumber: true,
                 })}
-                className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+                className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
               />
               {savingThrowForm.formState.errors.roll_value && (
                 <p className="text-red-500 text-sm mt-1">
@@ -560,7 +560,7 @@ export function QuickLogForm() {
                 min="1"
                 max="30"
                 {...savingThrowForm.register('dc', { valueAsNumber: true })}
-                className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+                className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
               />
             </div>
           </div>
@@ -575,17 +575,17 @@ export function QuickLogForm() {
                 <input
                   type="checkbox"
                   {...savingThrowForm.register('had_advantage')}
-                  className="w-4 h-4 border-border-subtle bg-bg-card-secondary text-accent-red corner-clip-sm"
+                  className="w-4 h-4 border-subtle bg-card-secondary text-red corner-clip-sm"
                 />
-                <span className="text-sm text-accent-green">Advantage</span>
+                <span className="text-sm text-green">Advantage</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   {...savingThrowForm.register('had_disadvantage')}
-                  className="w-4 h-4 border-border-subtle bg-bg-card-secondary text-accent-red corner-clip-sm"
+                  className="w-4 h-4 border-subtle bg-card-secondary text-red corner-clip-sm"
                 />
-                <span className="text-sm text-accent-red">Disadvantage</span>
+                <span className="text-sm text-red">Disadvantage</span>
               </label>
             </div>
           </div>
@@ -601,9 +601,9 @@ export function QuickLogForm() {
               {...savingThrowForm.register('additional_modifier', {
                 valueAsNumber: true,
               })}
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
             />
-            <p className="text-xs text-text-secondary mt-1">
+            <p className="text-xs text-secondary mt-1">
               Extra bonus/penalty beyond ability modifiers
             </p>
           </div>
@@ -618,7 +618,7 @@ export function QuickLogForm() {
               {...savingThrowForm.register('xp_gained', {
                 valueAsNumber: true,
               })}
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
             />
           </div>
 
@@ -629,14 +629,14 @@ export function QuickLogForm() {
             <textarea
               {...savingThrowForm.register('description')}
               rows={2}
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
             />
           </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full px-4 py-2 bg-accent-red text-white corner-clip-sm hover:bg-accent-red/90 shadow-hard active:shadow-none active:translate-y-0.5 transition-colors disabled:opacity-50"
+            className="w-full px-4 py-2 bg-red text-white corner-clip-sm hover:bg-red/90 shadow-hard active:shadow-none active:translate-y-0.5 transition-colors disabled:opacity-50"
           >
             {isSubmitting ? 'Logging...' : 'Log Saving Throw'}
           </button>
@@ -656,7 +656,7 @@ export function QuickLogForm() {
             <input
               type="text"
               {...customEffectForm.register('effect_name')}
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
               placeholder="e.g., Blessed by the Moon"
             />
             {customEffectForm.formState.errors.effect_name && (
@@ -682,7 +682,7 @@ export function QuickLogForm() {
                 setTempStatModifiers([])
                 setCustomEffectSubEffects([])
               }}
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
             >
               <option value="stat_modifier">Stat Modifier</option>
               <option value="advantage">Advantage</option>
@@ -711,7 +711,7 @@ export function QuickLogForm() {
                           customEffectForm.setValue('applies_to', current.filter(x => x !== 'ability_checks'))
                         }
                       }}
-                      className="w-4 h-4 border-border-subtle bg-bg-card-secondary corner-clip-sm"
+                      className="w-4 h-4 border-subtle bg-card-secondary corner-clip-sm"
                     />
                     <span className="text-sm">Ability Checks</span>
                   </label>
@@ -727,7 +727,7 @@ export function QuickLogForm() {
                           customEffectForm.setValue('applies_to', current.filter(x => x !== 'saving_throws'))
                         }
                       }}
-                      className="w-4 h-4 border-border-subtle bg-bg-card-secondary corner-clip-sm"
+                      className="w-4 h-4 border-subtle bg-card-secondary corner-clip-sm"
                     />
                     <span className="text-sm">Saving Throws</span>
                   </label>
@@ -743,12 +743,12 @@ export function QuickLogForm() {
                           customEffectForm.setValue('applies_to', current.filter(x => x !== 'passive_modifier'))
                         }
                       }}
-                      className="w-4 h-4 border-border-subtle bg-bg-card-secondary corner-clip-sm"
+                      className="w-4 h-4 border-subtle bg-card-secondary corner-clip-sm"
                     />
                     <span className="text-sm">Passive Modifier (always active)</span>
                   </label>
                 </div>
-                <p className="text-xs text-text-secondary mt-1">
+                <p className="text-xs text-secondary mt-1">
                   Leave all unchecked to apply to everything
                 </p>
               </div>
@@ -761,7 +761,7 @@ export function QuickLogForm() {
                   <select
                     value={currentStatName}
                     onChange={(e) => setCurrentStatName(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-bg-card border border-border-subtle corner-clip-sm text-sm"
+                    className="flex-1 px-3 py-2 bg-card border border-subtle corner-clip-sm text-sm"
                   >
                     <option value="">Select stat/ability...</option>
                     {abilities.map((ability) => (
@@ -775,7 +775,7 @@ export function QuickLogForm() {
                     value={currentStatModifier}
                     onChange={(e) => setCurrentStatModifier(e.target.value ? Number(e.target.value) : '')}
                     placeholder="+2, -1, etc."
-                    className="w-24 px-3 py-2 bg-bg-card border border-border-subtle corner-clip-sm text-sm"
+                    className="w-24 px-3 py-2 bg-card border border-subtle corner-clip-sm text-sm"
                   />
                   <button
                     type="button"
@@ -788,7 +788,7 @@ export function QuickLogForm() {
                         setCurrentStatModifier('')
                       }
                     }}
-                    className="px-3 py-2 bg-accent-red text-white corner-clip-sm hover:bg-accent-red/90 shadow-hard active:shadow-none active:translate-y-0.5 text-sm"
+                    className="px-3 py-2 bg-red text-white corner-clip-sm hover:bg-red/90 shadow-hard active:shadow-none active:translate-y-0.5 text-sm"
                   >
                     Add
                   </button>
@@ -797,7 +797,7 @@ export function QuickLogForm() {
                 {tempStatModifiers.length > 0 && (
                   <div className="space-y-1">
                     {tempStatModifiers.map((mod, idx) => (
-                      <div key={idx} className="flex justify-between items-center p-2 bg-bg-card-secondary corner-clip-sm border border-border-subtle text-sm">
+                      <div key={idx} className="flex justify-between items-center p-2 bg-card-secondary corner-clip-sm border border-subtle text-sm">
                         <span>
                           {mod.modifier > 0 ? '+' : ''}{mod.modifier} <span className="uppercase">{mod.stat}</span>
                         </span>
@@ -808,7 +808,7 @@ export function QuickLogForm() {
                             setTempStatModifiers(newMods)
                             customEffectForm.setValue('stat_modifiers', newMods)
                           }}
-                          className="text-accent-red hover:text-red-300"
+                          className="text-red hover:text-red-300"
                         >
                           Remove
                         </button>
@@ -841,7 +841,7 @@ export function QuickLogForm() {
                           customEffectForm.setValue('applies_to', current.filter(x => x !== 'ability_checks'))
                         }
                       }}
-                      className="w-4 h-4 border-border-subtle bg-bg-card-secondary corner-clip-sm"
+                      className="w-4 h-4 border-subtle bg-card-secondary corner-clip-sm"
                     />
                     <span className="text-sm">Ability Checks</span>
                   </label>
@@ -857,7 +857,7 @@ export function QuickLogForm() {
                           customEffectForm.setValue('applies_to', current.filter(x => x !== 'saving_throws'))
                         }
                       }}
-                      className="w-4 h-4 border-border-subtle bg-bg-card-secondary corner-clip-sm"
+                      className="w-4 h-4 border-subtle bg-card-secondary corner-clip-sm"
                     />
                     <span className="text-sm">Saving Throws</span>
                   </label>
@@ -873,12 +873,12 @@ export function QuickLogForm() {
                           customEffectForm.setValue('applies_to', current.filter(x => x !== 'passive_modifier'))
                         }
                       }}
-                      className="w-4 h-4 border-border-subtle bg-bg-card-secondary corner-clip-sm"
+                      className="w-4 h-4 border-subtle bg-card-secondary corner-clip-sm"
                     />
                     <span className="text-sm">Passive Modifier (always active)</span>
                   </label>
                 </div>
-                <p className="text-xs text-text-secondary mt-1">
+                <p className="text-xs text-secondary mt-1">
                   Leave all unchecked to apply to everything
                 </p>
               </div>
@@ -901,7 +901,7 @@ export function QuickLogForm() {
                             customEffectForm.setValue('affected_stats', current.filter(x => x !== ability.ability_name))
                           }
                         }}
-                        className="w-4 h-4 border-border-subtle bg-bg-card-secondary corner-clip-sm"
+                        className="w-4 h-4 border-subtle bg-card-secondary corner-clip-sm"
                       />
                       <span className="text-sm uppercase">{ability.ability_name}</span>
                     </label>
@@ -919,9 +919,9 @@ export function QuickLogForm() {
                     setValueAs: (v) => v === '' || v === null ? null : Number(v)
                   })}
                   placeholder="+1, -2, etc."
-                  className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+                  className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
                 />
-                <p className="text-xs text-text-secondary mt-1">
+                <p className="text-xs text-secondary mt-1">
                   Additional bonus/penalty along with {customEffectForm.watch('effect_type')}
                 </p>
               </div>
@@ -935,11 +935,11 @@ export function QuickLogForm() {
                 Create multiple effects under one custom effect (expires at midnight)
               </div>
               
-              <div className="text-sm text-text-secondary">
+              <div className="text-sm text-secondary">
                 Custom effects allow you to combine multiple modifiers, advantage/disadvantage effects, etc. into a single temporary buff or debuff.
               </div>
 
-              <div className="text-sm text-text-secondary italic">
+              <div className="text-sm text-secondary italic">
                 Note: Custom type with multiple sub-effects is complex. For now, use individual Stat Modifier or Advantage/Disadvantage effects.
               </div>
             </div>
@@ -953,14 +953,14 @@ export function QuickLogForm() {
               {...customEffectForm.register('description')}
               rows={2}
               placeholder="Additional details about this effect..."
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm"
             />
           </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full px-4 py-2 bg-accent-red text-white corner-clip-sm hover:bg-accent-red/90 shadow-hard active:shadow-none active:translate-y-0.5 transition-colors disabled:opacity-50"
+            className="w-full px-4 py-2 bg-red text-white corner-clip-sm hover:bg-red/90 shadow-hard active:shadow-none active:translate-y-0.5 transition-colors disabled:opacity-50"
           >
             {isSubmitting ? 'Creating...' : 'Create Custom Effect'}
           </button>

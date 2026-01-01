@@ -5,15 +5,15 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 corner-clip-sm [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 corner-clip-sm [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-accent-red text-white shadow-hard hover:bg-accent-red-hover active:shadow-none active:translate-y-0.5",
-        secondary: "bg-bg-card text-text-secondary border-2 border-accent-red shadow-hard hover:bg-bg-card-secondary hover:text-text-primary active:shadow-none active:translate-y-0.5",
-        ghost: "text-text-secondary hover:text-accent-red hover:bg-bg-card-secondary",
-        destructive: "bg-accent-red text-white shadow-hard hover:bg-accent-red-hover active:shadow-none active:translate-y-0.5",
-        link: "text-accent-red underline-offset-4 hover:underline",
+        default: "bg-red text-white shadow-hard hover:bg-red-hover active:shadow-none active:translate-y-0.5",
+        secondary: "bg-card text-secondary border-2 border-red shadow-hard hover:bg-card-secondary hover:text-primary active:shadow-none active:translate-y-0.5",
+        ghost: "text-secondary hover:text-red hover:bg-card-secondary",
+        destructive: "bg-red text-white shadow-hard hover:bg-red-hover active:shadow-none active:translate-y-0.5",
+        link: "text-red underline-offset-4 hover:underline",
       },
       size: {
         default: "h-9 px-4 py-2",

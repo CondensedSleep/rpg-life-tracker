@@ -76,7 +76,7 @@ export function TraitsList() {
       {/* Traits Grid */}
       {traits.length === 0 ? (
         <div className="p-6 bg-bg-secondary rounded-lg border border-border text-center">
-          <p className="text-text-secondary">
+          <p className="text-secondary">
             No traits yet. Add your first trait to define your character's unique features and flaws.
           </p>
         </div>
@@ -93,13 +93,13 @@ export function TraitsList() {
                     <h3 className="text-lg font-bold uppercase">{trait.trait_name}</h3>
                     {getTraitTypeBadge(trait.trait_type)}
                     {!trait.is_active && (
-                      <Badge variant="outline" className="text-text-secondary">
+                      <Badge variant="outline" className="text-secondary">
                         Inactive
                       </Badge>
                     )}
                   </div>
                   {trait.description && (
-                    <p className="text-text-secondary">{trait.description}</p>
+                    <p className="text-secondary">{trait.description}</p>
                   )}
                   {trait.mechanical_effect && trait.mechanical_effect.length > 0 && (
                     <div className="text-sm text-accent-secondary space-y-1">

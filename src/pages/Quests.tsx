@@ -51,7 +51,7 @@ export function Quests() {
             setEditingQuest(null)
             setShowQuestForm(true)
           }}
-          className="flex items-center gap-2 px-4 py-2 bg-accent-red text-white corner-clip-sm hover:bg-accent-red/90 shadow-hard active:shadow-none active:translate-y-0.5 transition-all"
+          className="flex items-center gap-2 px-4 py-2 bg-red text-white corner-clip-sm hover:bg-red/90 shadow-hard active:shadow-none active:translate-y-0.5 transition-all"
         >
           <Plus className="w-5 h-5" />
           Create Quest
@@ -61,11 +61,11 @@ export function Quests() {
       {/* Two-column top section: Side Quests | Recurring Quests */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         {/* Side Quests */}
-        <div className="p-6 bg-bg-card corner-clip shadow-card">
+        <div className="p-6 bg-card corner-clip shadow-card">
           <h2 className="text-2xl font-bold mb-4">Side Quests</h2>
           <div className="space-y-2">
             {sideQuests.length === 0 ? (
-              <p className="text-text-secondary text-sm">No side quests yet</p>
+              <p className="text-secondary text-sm">No side quests yet</p>
             ) : (
               sideQuests.map((quest) => (
                 <QuestCard
@@ -83,11 +83,11 @@ export function Quests() {
         </div>
 
         {/* Recurring Quests */}
-        <div className="p-6 bg-bg-card corner-clip shadow-card">
+        <div className="p-6 bg-card corner-clip shadow-card">
           <h2 className="text-2xl font-bold mb-4">Recurring Quests</h2>
           <div className="space-y-2">
             {recurringQuests.length === 0 ? (
-              <p className="text-text-secondary text-sm">No recurring quests yet</p>
+              <p className="text-secondary text-sm">No recurring quests yet</p>
             ) : (
               recurringQuests.map((quest) => (
                 <QuestCard
@@ -106,11 +106,11 @@ export function Quests() {
       </div>
 
       {/* Full-width bottom section: Main Quests */}
-      <div className="p-6 bg-bg-card corner-clip shadow-card">
+      <div className="p-6 bg-card corner-clip shadow-card">
         <h2 className="text-2xl font-bold mb-4">Main Quests</h2>
         <div className="space-y-3">
           {mainQuests.length === 0 ? (
-            <p className="text-text-secondary text-sm">No main quests yet</p>
+            <p className="text-secondary text-sm">No main quests yet</p>
           ) : (
             mainQuests.map((quest) => (
               <QuestCard
@@ -267,8 +267,8 @@ const QuestCard = memo(function QuestCard({ quest, onEdit, onDelete }: { quest: 
     <div
       className={`p-4 corner-clip-sm border transition-all ${
         isCompleted
-          ? 'bg-bg-card-secondary/50 border-border-subtle/50 opacity-60'
-          : 'bg-bg-card-secondary border-border-subtle hover:border-accent-red/50'
+          ? 'bg-card-secondary/50 border-subtle/50 opacity-60'
+          : 'bg-card-secondary border-subtle hover:border-red/50'
       }`}
     >
       <div className="flex items-start gap-3">
@@ -278,13 +278,13 @@ const QuestCard = memo(function QuestCard({ quest, onEdit, onDelete }: { quest: 
           onClick={handleToggle}
         >
           {isRecurring ? (
-            <div className="flex items-center justify-center w-6 h-6 corner-clip-sm border-2 border-accent-red bg-bg-card text-xs font-bold text-accent-red">
+            <div className="flex items-center justify-center w-6 h-6 corner-clip-sm border-2 border-red bg-card text-xs font-bold text-red">
               {quest.times_completed}
             </div>
           ) : isCompleted ? (
-            <CheckSquare className="w-6 h-6 text-accent-red" />
+            <CheckSquare className="w-6 h-6 text-red" />
           ) : (
-            <Square className="w-6 h-6 text-text-secondary hover:text-accent-red transition-colors" />
+            <Square className="w-6 h-6 text-secondary hover:text-red transition-colors" />
           )}
         </button>
 
@@ -298,25 +298,25 @@ const QuestCard = memo(function QuestCard({ quest, onEdit, onDelete }: { quest: 
               {quest.core_stat.map((stat) => (
                 <span
                   key={stat}
-                  className="text-xs px-2 py-0.5 corner-clip-sm bg-accent-red/10 text-accent-red uppercase"
+                  className="text-xs px-2 py-0.5 corner-clip-sm bg-red/10 text-red uppercase"
                 >
                   {stat}
                 </span>
               ))}
-              <span className="text-xs px-2 py-0.5 corner-clip-sm bg-accent-green/10 text-accent-green">
+              <span className="text-xs px-2 py-0.5 corner-clip-sm bg-green/10 text-green">
                 {quest.xp_reward} XP
               </span>
             </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={onEdit}
-                className="text-xs px-2 py-1 text-text-secondary hover:text-accent-red transition-colors"
+                className="text-xs px-2 py-1 text-secondary hover:text-red transition-colors"
               >
                 Edit
               </button>
               <button
                 onClick={onDelete}
-                className="p-1 text-text-secondary hover:text-accent-red transition-colors"
+                className="p-1 text-secondary hover:text-red transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -324,7 +324,7 @@ const QuestCard = memo(function QuestCard({ quest, onEdit, onDelete }: { quest: 
           </div>
 
           {quest.description && (
-            <p className="text-sm text-text-secondary mt-2">{quest.description}</p>
+            <p className="text-sm text-secondary mt-2">{quest.description}</p>
           )}
 
           {/* Render quest tree for MAIN quests */}

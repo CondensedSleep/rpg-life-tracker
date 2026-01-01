@@ -151,14 +151,14 @@ export function Journal() {
   if (!character) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-text-secondary">Loading character data...</p>
+        <p className="text-secondary">Loading character data...</p>
       </div>
     )
   }
 
   const dayStateInfo = {
     difficult: { label: 'Difficult Terrain', emoji: '⚠️', color: 'text-accent-primary' },
-    normal: { label: 'Normal Day', emoji: '📅', color: 'text-text-primary' },
+    normal: { label: 'Normal Day', emoji: '📅', color: 'text-primary' },
     inspiration: { label: 'Inspiration', emoji: '✨', color: 'text-accent-success' },
     critical: { label: 'Critical Day', emoji: '🌟', color: 'text-accent-warning' },
   }
@@ -178,7 +178,7 @@ export function Journal() {
   return (
     <div className="container mx-auto p-4 max-w-5xl space-y-6">
       {/* Date Navigation */}
-      <div className="flex items-center justify-between p-4 bg-bg-card corner-clip shadow-card">
+      <div className="flex items-center justify-between p-4 bg-card corner-clip shadow-card">
         <Button onClick={handlePreviousDay} variant="outline">
           ← Previous Day
         </Button>
@@ -188,7 +188,7 @@ export function Journal() {
             {formattedDate}
           </h1>
           {isToday && <span className="text-sm text-accent-success">Today</span>}
-          {isFuture && <span className="text-sm text-text-secondary">Future Date</span>}
+          {isFuture && <span className="text-sm text-secondary">Future Date</span>}
         </div>
 
         <div className="flex gap-2">
@@ -208,7 +208,7 @@ export function Journal() {
       </div>
 
       {/* Daily Roll Section */}
-      <div className="p-6 bg-bg-card corner-clip shadow-card">
+      <div className="p-6 bg-card corner-clip shadow-card">
         <h2 className="text-xl font-semibold mb-4">Daily Roll</h2>
 
         {dailyRoll ? (
@@ -216,7 +216,7 @@ export function Journal() {
             <div className={`text-2xl font-bold mb-2 ${currentDayInfo?.color}`}>
               {currentDayInfo?.emoji} {currentDayInfo?.label}
             </div>
-            <div className="text-sm text-text-secondary space-y-1">
+            <div className="text-sm text-secondary space-y-1">
               <div>Roll: {dailyRoll.roll_value}</div>
               {dailyRoll.day_state === 'difficult' && dailyRoll.affected_stats && (
                 <div>Disadvantage on: <span className="uppercase">{dailyRoll.affected_stats.join(', ')}</span></div>
@@ -273,7 +273,7 @@ export function Journal() {
                     ? 'Select abilities with disadvantage (multiple allowed)' 
                     : 'Select ONE ability with advantage'}
                 </Label>
-                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto p-2 bg-bg-card-secondary corner-clip-sm">
+                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto p-2 bg-card-secondary corner-clip-sm">
                   {abilities.map(ability => (
                     <div key={ability.id} className="flex items-center space-x-2">
                       <Checkbox
@@ -304,7 +304,7 @@ export function Journal() {
       </div>
 
       {/* Journal Text Editor */}
-      <div className="p-6 bg-bg-card corner-clip shadow-card">
+      <div className="p-6 bg-card corner-clip shadow-card">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Journal Entry</h2>
           <Button 
@@ -322,7 +322,7 @@ export function Journal() {
           className="min-h-[300px] font-mono"
         />
 
-        <p className="text-xs text-text-secondary mt-2">
+        <p className="text-xs text-secondary mt-2">
           Last saved: {journalEntry?.updated_at 
             ? new Date(journalEntry.updated_at).toLocaleString()
             : 'Not yet saved'}
@@ -330,17 +330,17 @@ export function Journal() {
       </div>
 
       {/* Action Log */}
-      <div className="p-6 bg-bg-card corner-clip shadow-card">
+      <div className="p-6 bg-card corner-clip shadow-card">
         <h2 className="text-xl font-semibold mb-4">Action Log</h2>
 
         {actionLog.length === 0 ? (
-          <p className="text-text-secondary text-sm">No actions logged for this day</p>
+          <p className="text-secondary text-sm">No actions logged for this day</p>
         ) : (
           <div className="space-y-2">
             {actionLog.map((action) => (
               <div
                 key={action.id}
-                className="p-3 bg-bg-card-secondary corner-clip-sm border border-border-subtle"
+                className="p-3 bg-card-secondary corner-clip-sm border border-subtle"
               >
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <div className="flex items-center gap-2">
@@ -358,14 +358,14 @@ export function Journal() {
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-text-secondary">
+                  <span className="text-xs text-secondary">
                     {action.action_time ? new Date(action.action_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                   </span>
                 </div>
                 
                 {/* Roll details */}
                 {action.roll_value !== null && (
-                  <div className="text-sm text-text-secondary mt-1">
+                  <div className="text-sm text-secondary mt-1">
                     <span>Roll: {action.roll_value}</span>
                     {action.modifier_breakdown && action.modifier_breakdown.length > 0 ? (
                       <>
@@ -396,7 +396,7 @@ export function Journal() {
 
                 {/* Quest completion */}
                 {action.quest_name && (
-                  <div className="text-sm text-text-secondary mt-1">
+                  <div className="text-sm text-secondary mt-1">
                     Quest: {action.quest_name}
                     {action.completion_status && (
                       <span className="ml-1 capitalize">({action.completion_status})</span>
@@ -405,7 +405,7 @@ export function Journal() {
                 )}
 
                 {action.notes && (
-                  <p className="text-sm mt-2 italic text-text-secondary">{action.notes}</p>
+                  <p className="text-sm mt-2 italic text-secondary">{action.notes}</p>
                 )}
               </div>
             ))}

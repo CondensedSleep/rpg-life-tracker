@@ -42,15 +42,15 @@ export function ActiveEffects() {
 
   if (!customEffects || customEffects.length === 0) {
     return (
-      <div className="p-6 bg-bg-card corner-clip shadow-card">
+      <div className="p-6 bg-card corner-clip shadow-card">
         <h2 className="text-lg font-semibold mb-3">Active Effects</h2>
-        <p className="text-sm text-text-secondary">No active effects</p>
+        <p className="text-sm text-secondary">No active effects</p>
       </div>
     )
   }
 
   return (
-    <div className="p-6 bg-bg-card corner-clip shadow-card">
+    <div className="p-6 bg-card corner-clip shadow-card">
       <h2 className="text-lg font-semibold mb-3">Active Effects</h2>
       <div className="space-y-2">
         {customEffects.map((effect) => {
@@ -63,7 +63,7 @@ export function ActiveEffects() {
           return (
             <div
               key={effect.id}
-              className="p-3 bg-bg-card-secondary corner-clip-sm border border-border-subtle flex items-start justify-between gap-3"
+              className="p-3 bg-card-secondary corner-clip-sm border border-subtle flex items-start justify-between gap-3"
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2">
@@ -84,7 +84,7 @@ export function ActiveEffects() {
                 </div>
 
                 {effect.description && (
-                  <p className="text-sm text-text-secondary mt-1">
+                  <p className="text-sm text-secondary mt-1">
                     {effect.description}
                   </p>
                 )}
@@ -98,14 +98,14 @@ export function ActiveEffects() {
                         {effect.stat_modifiers.map((mod, idx) => (
                           <span
                             key={idx}
-                            className="text-xs px-2 py-1 bg-bg-card corner-clip-sm border border-border-subtle uppercase"
+                            className="text-xs px-2 py-1 bg-card corner-clip-sm border border-subtle uppercase"
                           >
                             {mod.modifier >= 0 ? '+' : ''}{mod.modifier} {mod.stat}
                           </span>
                         ))}
                       </div>
                       {effect.applies_to && effect.applies_to.length > 0 && (
-                        <p className="text-xs text-text-secondary mt-1">
+                        <p className="text-xs text-secondary mt-1">
                           {formatAppliesTo(effect.applies_to)}
                         </p>
                       )}
@@ -118,7 +118,7 @@ export function ActiveEffects() {
                   effect.affected_stats &&
                   effect.affected_stats.length > 0 && (
                     <div className="mt-2">
-                      <p className="text-sm text-accent-red">
+                      <p className="text-sm text-red">
                         {effect.effect_type === 'advantage' ? 'Advantage' : 'Disadvantage'}
                         {effect.modifier ? ` (${effect.modifier > 0 ? '+' : ''}${effect.modifier})` : ''} on{' '}
                         <span className="uppercase">
@@ -126,21 +126,21 @@ export function ActiveEffects() {
                         </span>
                       </p>
                       {effect.applies_to && effect.applies_to.length > 0 && (
-                        <p className="text-xs text-text-secondary mt-1">
+                        <p className="text-xs text-secondary mt-1">
                           {formatAppliesTo(effect.applies_to)}
                         </p>
                       )}
                     </div>
                   )}
 
-                <p className="text-xs text-text-secondary mt-2">
+                <p className="text-xs text-secondary mt-2">
                   Expires in {hoursUntilExpire}h (at midnight)
                 </p>
               </div>
 
               <button
                 onClick={() => handleRemoveEffect(effect.id, effect.effect_name)}
-                className="px-3 py-1 text-sm bg-accent-red/10 text-accent-red border border-accent-red/30 corner-clip-sm hover:bg-accent-red/20 transition-colors"
+                className="px-3 py-1 text-sm bg-red/10 text-red border border-red/30 corner-clip-sm hover:bg-red/20 transition-colors"
               >
                 Remove
               </button>

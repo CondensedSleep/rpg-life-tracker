@@ -6,10 +6,10 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-bg-base">
+      <div className="flex items-center justify-center min-h-screen bg-base">
         <div className="text-center">
           <div className="text-2xl font-bold mb-2">Loading...</div>
-          <div className="text-text-secondary">Checking authentication</div>
+          <div className="text-secondary">Checking authentication</div>
         </div>
       </div>
     )

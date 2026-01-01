@@ -51,7 +51,7 @@ export function PassiveEffectBuilder({ form }: PassiveEffectBuilderProps) {
       </div>
 
       {fields.length === 0 ? (
-        <p className="text-sm text-text-secondary p-4 border border-border-subtle rounded-lg bg-bg-card-secondary">
+        <p className="text-sm text-secondary p-4 border border-subtle rounded-lg bg-card-secondary">
           No effects added. Click "Add Effect" to add passive effects to this item.
         </p>
       ) : (
@@ -65,7 +65,7 @@ export function PassiveEffectBuilder({ form }: PassiveEffectBuilderProps) {
             return (
               <div
                 key={field.id}
-                className="space-y-4 p-4 border border-border-subtle rounded-lg bg-bg-card-secondary-sm"
+                className="space-y-4 p-4 border border-subtle rounded-lg bg-card-secondary-sm"
               >
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium text-sm">Effect {index + 1}</h4>
@@ -170,7 +170,7 @@ export function PassiveEffectBuilder({ form }: PassiveEffectBuilderProps) {
                         </label>
                       </div>
                     </div>
-                    <p className="text-xs text-text-secondary">
+                    <p className="text-xs text-secondary">
                       If no options selected, effect applies to all roll types
                     </p>
                   </div>
@@ -199,7 +199,7 @@ export function PassiveEffectBuilder({ form }: PassiveEffectBuilderProps) {
                     </div>
 
                     {statModifiers.length === 0 ? (
-                      <p className="text-xs text-text-secondary italic">
+                      <p className="text-xs text-secondary italic">
                         No stat modifiers added. Click "Add Stat" to add modifiers.
                       </p>
                     ) : (
@@ -319,7 +319,7 @@ export function PassiveEffectBuilder({ form }: PassiveEffectBuilderProps) {
                           setValueAs: (v) => v === '' || v === null ? undefined : Number(v),
                         })}
                       />
-                      <p className="text-xs text-text-secondary mt-1">
+                      <p className="text-xs text-secondary mt-1">
                         Additional modifier beyond advantage/disadvantage
                       </p>
                     </div>
@@ -351,7 +351,7 @@ export function PassiveEffectBuilder({ form }: PassiveEffectBuilderProps) {
                       placeholder="e.g., nutrition > 0"
                       {...form.register(`passive_effect.${index}.condition`)}
                     />
-                    <p className="text-xs text-text-secondary mt-1">
+                    <p className="text-xs text-secondary mt-1">
                       When this condition is true, the effect applies
                     </p>
                   </div>

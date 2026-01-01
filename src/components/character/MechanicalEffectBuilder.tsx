@@ -51,7 +51,7 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
       </div>
 
       {fields.length === 0 ? (
-        <p className="text-sm text-text-secondary p-4 border border-border-subtle rounded-lg bg-bg-card-secondary">
+        <p className="text-sm text-secondary p-4 border border-subtle rounded-lg bg-card-secondary">
           No effects added. Click "Add Effect" to add mechanical effects to this trait.
         </p>
       ) : (
@@ -65,7 +65,7 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
             return (
               <div
                 key={field.id}
-                className="space-y-4 p-4 border border-border-subtle rounded-lg bg-bg-card-secondary-sm"
+                className="space-y-4 p-4 border border-subtle rounded-lg bg-card-secondary-sm"
               >
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium text-sm">Effect {index + 1}</h4>
@@ -170,7 +170,7 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
                         </label>
                       </div>
                     </div>
-                    <p className="text-xs text-text-secondary">
+                    <p className="text-xs text-secondary">
                       If no options selected, effect applies to all roll types
                     </p>
                   </div>
@@ -199,7 +199,7 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
                     </div>
 
                     {statModifiers.length === 0 ? (
-                      <p className="text-xs text-text-secondary italic">
+                      <p className="text-xs text-secondary italic">
                         No stat modifiers added. Click "Add Stat" to add modifiers.
                       </p>
                     ) : (
@@ -319,7 +319,7 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
                           setValueAs: (v) => v === '' || v === null ? undefined : Number(v),
                         })}
                       />
-                      <p className="text-xs text-text-secondary mt-1">
+                      <p className="text-xs text-secondary mt-1">
                         Additional modifier beyond advantage/disadvantage
                       </p>
                     </div>
@@ -344,14 +344,14 @@ export function MechanicalEffectBuilder({ form }: MechanicalEffectBuilderProps) 
                 {effectType && effectType !== 'custom' && (
                   <div>
                     <Label htmlFor={`condition-${index}`}>
-                      Condition <span className="text-text-secondary">(determines if trait is active)</span>
+                      Condition <span className="text-secondary">(determines if trait is active)</span>
                     </Label>
                     <Input
                       id={`condition-${index}`}
                       placeholder="e.g., drive > 0, always"
                       {...form.register(`mechanical_effect.${index}.condition`)}
                     />
-                    <p className="text-xs text-text-secondary mt-1">
+                    <p className="text-xs text-secondary mt-1">
                       Trait is active when this condition is true. Use "always" for traits that are always active, or expressions like "drive &gt; 0"
                     </p>
                   </div>

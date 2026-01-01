@@ -34,8 +34,8 @@ export function Auth() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg-base">
-      <div className="max-w-md w-full p-8 bg-bg-card corner-clip shadow-card">
+    <div className="min-h-screen flex items-center justify-center bg-base">
+      <div className="max-w-md w-full p-8 bg-card corner-clip shadow-card">
         <h1 className="text-3xl font-bold mb-6 text-center">
           RPG Life Tracker
         </h1>
@@ -46,8 +46,8 @@ export function Auth() {
               onClick={() => setIsSignUp(false)}
               className={`flex-1 py-2 rounded ${
                 !isSignUp
-                  ? 'bg-accent-red text-white'
-                  : 'bg-bg-card-secondary text-text-secondary'
+                  ? 'bg-red text-white'
+                  : 'bg-card-secondary text-secondary'
               }`}
             >
               Sign In
@@ -56,8 +56,8 @@ export function Auth() {
               onClick={() => setIsSignUp(true)}
               className={`flex-1 py-2 rounded ${
                 isSignUp
-                  ? 'bg-accent-red text-white'
-                  : 'bg-bg-card-secondary text-text-secondary'
+                  ? 'bg-red text-white'
+                  : 'bg-card-secondary text-secondary'
               }`}
             >
               Sign Up
@@ -76,7 +76,7 @@ export function Auth() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm focus:outline-none focus:border-accent-red focus:border-2"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm focus:outline-none focus:border-red focus:border-2"
               placeholder="you@example.com"
             />
           </div>
@@ -92,7 +92,7 @@ export function Auth() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-3 py-2 bg-bg-card-secondary border-border-subtle corner-clip-sm focus:outline-none focus:border-accent-red focus:border-2"
+              className="w-full px-3 py-2 bg-card-secondary border-subtle corner-clip-sm focus:outline-none focus:border-red focus:border-2"
               placeholder="••••••••"
             />
           </div>
@@ -100,7 +100,7 @@ export function Auth() {
           {error && (
             <div className={`p-3 rounded ${
               error.includes('Check your email')
-                ? 'bg-accent-green/10 text-accent-green border border-accent-green/20 corner-clip-sm'
+                ? 'bg-green/10 text-green border border-green/20 corner-clip-sm'
                 : 'bg-accent-primary/10 text-accent-primary border border-accent-primary/20'
             }`}>
               {error}
@@ -117,7 +117,7 @@ export function Auth() {
         </form>
 
         {isSignUp && (
-          <p className="mt-4 text-sm text-text-secondary text-center">
+          <p className="mt-4 text-sm text-secondary text-center">
             You'll receive a confirmation email after signing up.
           </p>
         )}

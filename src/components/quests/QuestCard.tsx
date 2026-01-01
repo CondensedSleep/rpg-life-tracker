@@ -59,12 +59,12 @@ export function QuestCard({ quest, onComplete, onEdit, onDelete }: QuestCardProp
             )}
           </div>
           {quest.description && (
-            <p className="text-text-secondary text-sm mb-2">{quest.description}</p>
+            <p className="text-secondary text-sm mb-2">{quest.description}</p>
           )}
           <div className="flex items-center gap-4 text-sm">
             <span className="text-accent-warning">+{quest.xp_reward} XP</span>
             {!isMainQuest && (
-              <span className="text-text-secondary">
+              <span className="text-secondary">
                 Completed: {quest.times_completed} times
               </span>
             )}

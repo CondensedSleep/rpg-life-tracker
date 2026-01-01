@@ -89,7 +89,7 @@ export function EditInitialValuesForm({
               <Label className="text-base font-semibold mb-2 block">
                 {getDisplayName().toUpperCase()}
               </Label>
-              <p className="text-sm text-text-secondary mb-3">
+              <p className="text-sm text-secondary mb-3">
                 Current initial value: {itemType === 'stat' ? (item as CoreStat).base_value : (item as Ability).base_value}
               </p>
             </div>
@@ -107,7 +107,7 @@ export function EditInitialValuesForm({
                   setError(null)
                 }}
               />
-              <p className="text-xs text-text-secondary mt-1">
+              <p className="text-xs text-secondary mt-1">
                 Must be between 1 and 20
               </p>
             </div>

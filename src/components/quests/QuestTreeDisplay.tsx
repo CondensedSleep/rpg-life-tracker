@@ -14,7 +14,7 @@ export function QuestTreeDisplay({ tree, quests, onToggleNode }: QuestTreeDispla
   }
 
   return (
-    <div className="mt-4 pt-4 border-t border-border-subtle space-y-1">
+    <div className="mt-4 pt-4 border-t border-subtle space-y-1">
       {tree.map((node) => (
         <TreeNodeDisplay
           key={node.id}
@@ -77,12 +77,12 @@ const TreeNodeDisplay = memo(function TreeNodeDisplay({ node, depth, quests, onT
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-0.5 hover:bg-bg-card-secondary corner-clip-sm"
+            className="p-0.5 hover:bg-card-secondary corner-clip-sm"
           >
             {isExpanded ? (
-              <ChevronDown className="w-4 h-4 text-text-secondary" />
+              <ChevronDown className="w-4 h-4 text-secondary" />
             ) : (
-              <ChevronRight className="w-4 h-4 text-text-secondary" />
+              <ChevronRight className="w-4 h-4 text-secondary" />
             )}
           </button>
         ) : (
@@ -104,26 +104,26 @@ const TreeNodeDisplay = memo(function TreeNodeDisplay({ node, depth, quests, onT
           {/* Show completion count badge for recurring quests */}
           {completionCount !== undefined && completionCount > 0 ? (
             <div className="relative">
-              <Circle className="w-4 h-4 text-text-secondary" />
-              <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-text-primary">
+              <Circle className="w-4 h-4 text-secondary" />
+              <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-primary">
                 {completionCount}
               </span>
             </div>
           ) : isCompleted ? (
-            <CheckCircle2 className="w-4 h-4 text-accent-green" />
+            <CheckCircle2 className="w-4 h-4 text-green" />
           ) : (
-            <Circle className="w-4 h-4 text-text-secondary" />
+            <Circle className="w-4 h-4 text-secondary" />
           )}
         </button>
 
         {/* Node Content */}
         <div className="flex items-center gap-2 flex-1">
           {node.type === 'quest' && (
-            <span className="px-1.5 py-0.5 text-xs font-semibold bg-accent-red/10 text-accent-red corner-clip-sm">
+            <span className="px-1.5 py-0.5 text-xs font-semibold bg-red/10 text-red corner-clip-sm">
               Quest
             </span>
           )}
-          <span className={`text-sm ${isCompleted ? 'text-text-secondary line-through' : 'text-text-primary'}`}>
+          <span className={`text-sm ${isCompleted ? 'text-secondary line-through' : 'text-primary'}`}>
             {displayText}
           </span>
         </div>

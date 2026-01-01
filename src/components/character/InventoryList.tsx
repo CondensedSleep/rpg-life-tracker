@@ -78,7 +78,7 @@ export function InventoryList() {
       {/* Inventory List */}
       {inventory.length === 0 ? (
         <div className="p-6 bg-bg-secondary rounded-lg border border-border text-center">
-          <p className="text-text-secondary">
+          <p className="text-secondary">
             No items yet. Add your first item to track your gear and equipment.
           </p>
         </div>
@@ -95,7 +95,7 @@ export function InventoryList() {
                     <h3 className="text-lg font-bold">
                       {item.item_name}
                       {(item.item_type || item.condition) && (
-                        <span className="text-base font-normal text-text-secondary ml-2">
+                        <span className="text-base font-normal text-secondary ml-2">
                           ({[item.item_type && item.item_type.charAt(0).toUpperCase() + item.item_type.slice(1), item.condition].filter(Boolean).join(', ')})
                         </span>
                       )}
@@ -108,7 +108,7 @@ export function InventoryList() {
                     )}
                   </div>
                   {item.description && (
-                    <p className="text-text-secondary">{item.description}</p>
+                    <p className="text-secondary">{item.description}</p>
                   )}
                   {item.passive_effect && item.passive_effect.length > 0 && (
                     <div className="text-sm text-accent-secondary space-y-1">
