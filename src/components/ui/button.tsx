@@ -11,6 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-red text-white shadow-hard hover:bg-red-hover active:shadow-none active:translate-y-0.5",
         secondary: "bg-card text-secondary border-2 border-red shadow-hard hover:bg-card-secondary hover:text-primary active:shadow-none active:translate-y-0.5",
+        outline: "bg-transparent border-2 border-red text-red hover:bg-red hover:text-white active:shadow-none active:translate-y-0.5",
         ghost: "text-secondary hover:text-red hover:bg-card-secondary",
         destructive: "bg-red text-white shadow-hard hover:bg-red-hover active:shadow-none active:translate-y-0.5",
         link: "text-red underline-offset-4 hover:underline",

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Scroll, BookOpen, BarChart3 } from 'lucide-react'
+import { Home, Scroll, BookOpen, Sparkles, BarChart3 } from 'lucide-react'
 
 interface NavItem {
   to: string
@@ -11,6 +11,7 @@ const navItems: NavItem[] = [
   { to: '/', icon: <Home size={24} />, label: 'Dashboard' },
   { to: '/quests', icon: <Scroll size={24} />, label: 'Quests' },
   { to: '/journal', icon: <BookOpen size={24} />, label: 'Journal' },
+  { to: '/effects', icon: <Sparkles size={24} />, label: 'Effects' },
   { to: '/stats', icon: <BarChart3 size={24} />, label: 'Stats' },
 ]
 
@@ -27,7 +28,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-subtle shadow-card">
         <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-5 gap-1">
             {navItems.map((item) => {
               const isActive = location.pathname === item.to
               return (

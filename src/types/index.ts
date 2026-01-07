@@ -12,6 +12,13 @@ export type CompletionStatus = 'full' | 'partial' | 'failed'
 export type RollType = 'skill_check' | 'saving_throw' | 'attack' | 'damage'
 
 // ============================================================================
+// Unified Effect & Roll System Exports
+// ============================================================================
+export * from './effects'
+export * from './rolls'
+export * from './tags'
+
+// ============================================================================
 // Character & Stats
 // ============================================================================
 

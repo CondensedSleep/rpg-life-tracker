@@ -6,6 +6,7 @@ import { Dashboard } from './pages/Dashboard'
 import { Quests } from './pages/Quests'
 import { Journal } from './pages/Journal'
 import { Stats } from './pages/Stats'
+import { Effects } from './pages/Effects'
 import { Auth } from './pages/Auth'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/quests" element={<Quests />} />
                     <Route path="/journal" element={<Journal />} />
+                    <Route path="/effects" element={<Effects />} />
                     <Route path="/stats" element={<Stats />} />
                   </Routes>
                 </MainLayout>

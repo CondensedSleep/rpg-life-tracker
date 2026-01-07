@@ -10,6 +10,7 @@ import type {
   AbilitiesByCoreStat,
 } from '@/types'
 import { recalculateCoreStats, calculateXPToNextLevel } from '@/lib/calculations'
+import { recalculateAbilityCurrentValues } from '@/lib/abilityCalculations'
 
 export interface CharacterState {
   // Data
@@ -47,6 +48,9 @@ export interface CharacterState {
   addItem: (item: InventoryItem) => void
   updateItem: (itemId: string, updates: Partial<InventoryItem>) => void
   removeItem: (itemId: string) => void
+
+  // Effect system
+  recalculateAbilities: () => Promise<void>
 
   // Computed values
   getAbilitiesByCoreStat: () => AbilitiesByCoreStat
@@ -206,6 +210,20 @@ export const createCharacterSlice: StateCreator<CharacterState> = (set, get) => 
   removeItem: (itemId) => {
     const { inventory } = get()
     set({ inventory: inventory.filter((item) => item.id !== itemId) })
+  },
+
+  // Effect system hooks - trigger recalculation of ability values
+  // Call these after effect changes in the unified effects system
+  recalculateAbilities: async () => {
+    const { character } = get()
+    if (!character) return
+    
+    try {
+      await recalculateAbilityCurrentValues(character.id)
+      console.log('✅ Ability values recalculated after effect change')
+    } catch (error) {
+      console.error('Failed to recalculate abilities:', error)
+    }
   },
 
   // Computed values

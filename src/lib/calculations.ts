@@ -210,6 +210,19 @@ export function evaluateTraitIsActive(
 
 /**
  * Calculate total modifier for an ability with all effects applied
+ * 
+ * @deprecated Use the unified effect system from '@/lib/effectSystem' instead:
+ * ```
+ * import { collectEffects, filterEffects, applyEffects } from '@/lib/effectSystem'
+ * import { EffectContext } from '@/types/effects'
+ * 
+ * const effects = collectEffects(state)
+ * const filtered = filterEffects(effects, abilityName, EffectContext.PASSIVE_MODIFIER, abilities)
+ * const result = applyEffects(filtered, baseModifier, abilityName)
+ * ```
+ * 
+ * This function eliminates 220+ lines of duplicate effect processing code.
+ * It will be removed in a future version.
  */
 export function calculateTotalModifier(
   abilityName: string,

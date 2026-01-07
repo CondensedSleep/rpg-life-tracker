@@ -4,9 +4,27 @@ import { calculateTotalModifier } from './calculations'
 import { getTodayLocalDate } from './dateUtils'
 
 // ============================================================================
-// ABILITY CHECK
+// DEPRECATED: Use rollSystem.ts instead
+// ============================================================================
+// The functions logAbilityCheck and logSavingThrow below are DEPRECATED.
+// They have been replaced by the unified roll system in src/lib/rollSystem.ts
+//
+// Migration path:
+// - Import from '@/lib/rollSystem' instead of '@/lib/actionLogService'
+// - The new functions have identical signatures and return format
+// - 369 lines of duplicate code eliminated
+//
+// These functions will be removed in a future version.
 // ============================================================================
 
+// ============================================================================
+// ABILITY CHECK (DEPRECATED)
+// ============================================================================
+
+/**
+ * @deprecated Use logAbilityCheck from '@/lib/rollSystem' instead
+ * This function is kept for backward compatibility and will be removed in a future version
+ */
 export async function logAbilityCheck(params: {
   characterId: string
   abilityName?: string | null
@@ -195,9 +213,13 @@ export async function logAbilityCheck(params: {
 }
 
 // ============================================================================
-// SAVING THROW
+// SAVING THROW (DEPRECATED)
 // ============================================================================
 
+/**
+ * @deprecated Use logSavingThrow from '@/lib/rollSystem' instead
+ * This function is kept for backward compatibility and will be removed in a future version
+ */
 export async function logSavingThrow(params: {
   characterId: string
   abilityName?: string | null

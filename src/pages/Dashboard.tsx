@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import type { DailyRoll, CoreStatName, Trait, InventoryItem } from '@/types'
 import { TraitForm } from '@/components/character/TraitForm'
 import { InventoryForm } from '@/components/character/InventoryForm'
-import { QuickLogForm } from '@/components/QuickLogForm'
+import { UnifiedRollForm } from '@/components/UnifiedRollForm'
 import { ActiveEffects } from '@/components/ActiveEffects'
 import { EditInitialValuesForm } from '@/components/EditInitialValuesForm'
 import { Button } from '@/components/ui/button'
@@ -773,10 +773,10 @@ export function Dashboard() {
       </div>
 
       {/* ================================================================
-          SECTION 3: Quick Log Form and Active Effects
+          SECTION 3: Unified Roll Form and Active Effects
           ================================================================ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <QuickLogForm />
+        <UnifiedRollForm />
         <ActiveEffects />
       </div>
 
